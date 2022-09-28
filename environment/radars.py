@@ -1,26 +1,26 @@
 import numpy as np
-
+from metrics import *
 
 class ShortRangeRadar:
     @staticmethod
     def get(position, targets) -> dict:
         pos_X, pos_Y = position
         radar = {
-            "N": 0,
-            "S": 0,
-            "E": 0,
-            "O": 0
+            ActionMoves.N: 0,
+            ActionMoves.S: 0,
+            ActionMoves.E: 0,
+            ActionMoves.O: 0
         }
 
         for gumX, gumY in targets:
             if gumX == pos_X - 1 and gumY == pos_Y:
-                radar["N"] = 1
+                radar[ActionMoves.N] = 1
             elif gumX == pos_X + 1 and gumY == pos_Y:
-                radar["S"] = 1
+                radar[ActionMoves.S] = 1
             elif gumX == pos_X and gumY == pos_Y + 1:
-                radar["E"] = 1
+                radar[ActionMoves.E] = 1
             elif gumX == pos_X and gumY == pos_Y - 1:
-                radar["O"] = 1
+                radar[ActionMoves.O] = 1
         return radar
 
 class GhostRadar:
@@ -41,13 +41,13 @@ class GhostRadar:
         closest_X, closest_Y = ghost_positions[np.argmin(ghost_dist)]
         direction = ""
         if closest_X < pacman_X and pacman_Y < closest_Y:
-            direction = "NE"
+            direction = GhostDirections.NE
         elif pacman_X < closest_X and pacman_Y < closest_Y:
-            direction = "NO"
+            direction = GhostDirections.NO
         elif closest_X < pacman_X and pacman_Y < closest_Y:
-            direction = "SO"
+            direction = GhostDirections.SO
         elif pacman_X < closest_X and pacman_Y < closest_Y:
-            direction = "SE"
+            direction = GhostDirections.SE
 
         return {
             "direction": direction,

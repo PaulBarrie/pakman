@@ -1,6 +1,9 @@
 from random import random
-import numpy as np
+from environment.metrics import *
+from enum import Enum
+
 from radars import ShortRangeRadar, GhostRadar
+
 MAP_WALL = '#'
 MAP_GUM = '.'
 MAP_PACMAN = 'P'
@@ -10,64 +13,86 @@ MAP_BLINKY = 'B'
 MAP_CLYDE = 'C'
 MAP_PINKY = 'P'
 MAP_GHOSTS = [MAP_INKY, MAP_BLINKY, MAP_CLYDE, MAP_PINKY]
-ACTION_UP = 'U'
-ACTION_DOWN = 'D'
-ACTION_LEFT = 'L'
-ACTION_RIGHT = 'R'
-ACTIONS = [ACTION_UP, ACTION_DOWN, ACTION_LEFT, ACTION_RIGHT]
-ACTION_MOVE = {ACTION_UP: (-1, 0),
-               ACTION_DOWN: (1, 0),
-               ACTION_LEFT: (0, -1),
-               ACTION_RIGHT: (0, 1)
-               }
+
+ACTION_MOVE = {
+    ActionMoves.N: (-1, 0),
+    ActionMoves.S: (1, 0),
+    ActionMoves.O: (0, -1),
+    ActionMoves.E: (0, 1)
+}
 REWARD_GUM = 1
 REWARD_DEFAULT = -1
-
+NB_STATES = 2 ** 4 * 2 ** 4 * 8 * 4
+REWARD_GHOST = -NB_STATES
+REWARD_WALL = -2 * REWARD_GHOST
 
 
 class Ghost:
-    def __init__(self, position, radar, direction_shift, file_sprite, pakman_position):
+    def __init__(self, position, radar, direction_shift, file_sprite, walls):
         self.__position = position
         self.__radar = radar
         self.__direction = None
         self.__direction_shift = direction_shift
         self.__file_sprite = file_sprite
+        self.__walls = walls
 
         def follow_direction():
             pos_X, pos_Y = self.__position
-            if self.__direction == "N":
-                self.__position = (pos_X - 1, pos_Y)
-            elif self.__direction == "S":
-                self.__position = (pos_X + 1, pos_Y)
-            elif self.__direction == "E":
-                self.__position = (pos_X, pos_Y + 1)
-            elif self.__direction == "O":
-                self.__position = (pos_X, pos_Y - 1)
+            if self.__direction == ActionMoves.N:
+                position = (pos_X - 1, pos_Y)
+            elif self.__direction == ActionMoves.S:
+                position = (pos_X + 1, pos_Y)
+            elif self.__direction == ActionMoves.E:
+                position = (pos_X, pos_Y + 1)
+            elif self.__direction == ActionMoves.O:
+                position = (pos_X, pos_Y - 1)
+            if position in self.__walls:
+                raise Exception("Ghost can't move to wall")
+            self.__position = position
+
+        """
+            If direction, follow it
+            If cant check two best directions, take the 1st one and change direction
+        """
 
         def move(pacman_pos):
             pacman_X, pacman_Y = self.__radar.pakman_position
             ghost_X, ghost_Y = self.__position
-            if self.__radar.radar[self.__direction] != MAP_WALL:
-                follow_direction()
-                return
-            if pacman_X < self.__position and self.__radar.radar["N"] != MAP_WALL:
-                if random() < direction_shift:
+
+            best_directions = []
+
+            if pacman_X < ghost_X:
+                best_directions.append(ActionMoves.N)
+            else:
+                best_directions.append(ActionMoves.S)
+
+            if pacman_Y < ghost_Y:
+                best_directions.append(ActionMoves.O)
+            else:
+                best_directions.append(ActionMoves.E)
+
+            if self.__direction in best_directions:
+                try:
+                    follow_direction()
+                except:
                     pass
-            self.__radar.update_radar()
+            else:
+                for direction in best_directions:
+                    try:
+                        follow_direction()
+                        break
+                    except:
+                        continue
 
         def get_sprite():
             pass
 
 
 class Environment:
-    def __init__(self, str_map):
-        self.__states = {
-            "ghost_radar": {"NO": 0, "NE": 0, "SO": 0, "SE": 0,
-                            "distance": 999999999999},
-            "gum_radar": {"N": 0, "S": 0, "E": 0, "O": 0},
-            "wall_radar": {"N": 0, "S": 0, "E": 0, "O": 0},
-        }
+    KEYS_STATE_CHARACTER_JOIN = '_'
+    RADAR_STATE_CHARACTER_JOIN = '|'
 
+    def __init__(self, str_map):
         row = 0
         col = 0
         self.__init_position = None
@@ -78,10 +103,13 @@ class Environment:
         self.__gum_radar = None
         self.__wall_radar = None
         self.__pacman = None
+        self.__ghost_radar = None
+        self.__gum_radar = None
+        self.__wall_radar = None
+        self.__state = None
 
         for line in str_map.strip().split('\n'):
             for item in line:
-                self.__states[row, col] = item
                 if item == MAP_GUM:
                     self.__gums.append((row, col))
                 elif item == MAP_WALL:
@@ -102,40 +130,53 @@ class Environment:
         self.__rows = row
         self.__cols = len(line)
         self.__reward_goal = REWARD_GUM
-        self.__reward_ghost = -len(self.__states)
-        self.__reward_wall = -2 * len(self.__states)
+        self.__reward_ghost = REWARD_GHOST
+        self.__reward_wall = REWARD_WALL
+        self.update(self.__pacman)
+
+    def update_radars(self):
         self.__ghost_radar = GhostRadar().get(self.__ghosts, self.__pacman)
         self.__gum_radar = ShortRangeRadar.get(self.__pacman, self.__gums)
         self.__wall_radar = ShortRangeRadar.get(self.__pacman, self.__walls)
 
-    def update_state(self, action):
-        new_grid = self.__str_map
+    def get_state(self):
+        return Environment.KEYS_STATE_CHARACTER_JOIN.join([self.__ghost_radar, self.__gum_radar, self.__wall_radar])
 
-    def do(self, state, action):
+    def update_state(self):
+        ghost_state = Environment.KEYS_STATE_CHARACTER_JOIN.join([k + str(v) for k, v in self.__ghost_radar.items()])
+        gum_state = Environment.KEYS_STATE_CHARACTER_JOIN.join([k + str(v) for k, v in self.__gum_radar.items()])
+        wall_state = Environment.KEYS_STATE_CHARACTER_JOIN.join([k + str(v) for k, v in self.__wall_radar.items()])
+
+        self.__state = Environment.RADAR_STATE_CHARACTER_JOIN.join([ghost_state, gum_state, wall_state])
+
+    def update(self, position):
+        self.__pacman = position
+        self.update_radars()
+        self.update_state()
+
+    def do(self, action):
         move = ACTION_MOVE[action]
-        new_state = (state[0] + move[0], state[1] + move[1])
+        pos_X, pos_Y = self.__pacman
+        new_position = (pos_X + move[0], pos_Y + move[1])
 
-        if new_state in self.__gums:
+        if new_position in self.__gums:
             reward = self.__reward_goal
-            state = new_state
-        elif self.__states[new_state] in MAP_GHOSTS:
+            self.__gums.remove(new_position)
+            self.update(new_position)
+        elif new_position in self.__ghosts:
             reward = self.__reward_ghost
-            state = self.__init_position
-        elif self.__states[new_state] == MAP_WALL:
+            self.update(self.__init_position)
+        elif new_position in self.__walls:
             reward = self.__reward_wall
         else:
-            state = new_state
             reward = REWARD_DEFAULT
+            self.update(new_position)
 
-        return state, reward
-
-        @property
-        def states(self):
-            return list(self.__states.keys())
+        return self.__state, reward
 
         @property
-        def start(self):
-            return self.__start
+        def state(self):
+            return self.__state
 
         @property
         def goal(self):

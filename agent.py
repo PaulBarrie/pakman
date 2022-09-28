@@ -1,24 +1,18 @@
 from random import *
 
 import pickle
-
-ACTION_UP = 'U'
-ACTION_DOWN = 'D'
-ACTION_LEFT = 'L'
-ACTION_RIGHT = 'R'
-ACTIONS = [ACTION_UP, ACTION_DOWN, ACTION_LEFT, ACTION_RIGHT]
+from environment.metrics import ActionMoves
 
 
 class Agent:
     def __init__(self, env, alpha=1, gamma=0.8, cooling_rate=0.999):
         self.__temperature = 0
         self.__score = 0
-        self.__state = env.start
+        self.__state = env.state
         self.__qtable = {}
-        for state in env.states:
-            self.__qtable[state] = {}
-            for action in ACTIONS:
-                self.__qtable[state][action] = 0.0
+        """
+        Should we init the qtable with all the possible states? 
+        """
         self.__env = env
         self.__alpha = alpha
         self.__gamma = gamma
@@ -39,15 +33,15 @@ class Agent:
     def best_action(self):
         if random() < self.__temperature:
             self.__temperature *= self.__cooling_rate
-            return choice(ACTIONS)
+            return choice(ActionMoves().list())
         else:
             q = self.__qtable[self.__state]
             return max(q, key=q.get)
 
     def step(self):
         action = self.best_action()
-        state, reward = self.__env.do(self.__state, action)
 
+        state, reward = self.__env.do(self.__state, action)
         maxQ = max(self.__qtable[state].values())
         delta = self.__alpha * (reward + self.__gamma * maxQ - self.__qtable[self.__state][action])
         self.__qtable[self.__state][action] += delta
