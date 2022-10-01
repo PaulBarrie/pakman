@@ -14,3 +14,10 @@ un fantôme, une gomme avec un fantôme. Si nous composions une qtable avec l'en
 soit quelque chose de l'ordre de 2^21 possibilités.
 Pour éviter une exploision du temps de calcul, nous allons définir un ensemble de radars avec une portée limitée à une case (droite/gauche, haut-bas)
 pour chacun des éléments qui composent le jeu. 
+
+# Discussions
+
+* Pour le radar fantome:
+ -> une variable [0,1,...8] =[N, S, NE, SE, NW, SW, E, W] qui indique la direction du fantôme par rapport au pacman
+ -> une variable pour la distance [0,1,2]=["1", "2", "SE3"] qui indique la distance entre le pacman et le fantôme
+* 

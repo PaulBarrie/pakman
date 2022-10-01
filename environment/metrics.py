@@ -9,6 +9,10 @@ class Distances:
 
 
 class GhostDirections:
+    N = "N"
+    S = "S"
+    E = "E"
+    O = "O"
     NO = "NO"
     NE = "NE"
     SO = "SO"
