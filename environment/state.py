@@ -1,5 +1,5 @@
 import numpy as np
-from metrics import *
+from environment.metrics import *
 
 
 class State:
@@ -10,7 +10,7 @@ class State:
         self.__gum_radar = None
         self.__wall_radar = None
 
-    def update(self, ghosts: [(int,int)], pacman: (int, int), gums: [(int, int)], walls: [(int, int)]):
+    def update(self, ghosts: list[(int,int)], pacman: tuple[int, int], gums: list[(int, int)], walls: list[(int, int)]):
         self.__ghost_radar = GhostRadar().get(ghosts, pacman)
         self.__gum_radar = ShortRangeRadar.get(pacman, gums)
         self.__wall_radar = ShortRangeRadar.get(pacman, walls)

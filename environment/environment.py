@@ -1,5 +1,5 @@
 from environment.metrics import *
-from state import State
+from environment.state import State
 
 MAP_WALL = '#'
 MAP_GUM = '.'
@@ -9,7 +9,6 @@ MAP_INKY = 'I'
 MAP_BLINKY = 'B'
 MAP_CLYDE = 'C'
 MAP_PINKY = 'R'
-
 MAP_GHOSTS = [MAP_INKY, MAP_BLINKY, MAP_CLYDE, MAP_PINKY]
 
 ACTION_MOVE = {
@@ -18,7 +17,6 @@ ACTION_MOVE = {
     ActionMoves.O: (0, -1),
     ActionMoves.E: (0, 1)
 }
-
 REWARD_GUM = 1
 REWARD_DEFAULT = -1
 NB_STATES = 2 ** 4 * 2 ** 4 * 8 * 4
@@ -107,7 +105,7 @@ class Environment:
                     self.__walls.append((row, col))
                 elif item in MAP_GHOSTS:
                     self.__ghosts.append((row, col))
-                elif item in MAP_PACMAN:
+                elif item == MAP_PACMAN:
                     self.__pacman = (row, col)
                     self.__init_position = (row, col)
 
@@ -119,7 +117,7 @@ class Environment:
             raise ValueError("Pacman not found in the game")
 
         self.__init_ghosts = self.__ghosts.copy()
-        self.__init_pacman = self.__pacman.copy()
+        self.__init_pacman = self.__pacman
 
         self.__state = State()
         self.__state.update(self.__ghosts, self.__pacman, self.__gums, self.__walls)
@@ -135,7 +133,7 @@ class Environment:
         self.__pacman = position
         self.__state.update(self.__ghosts, position, self.__gums, self.__walls)
 
-    def do(self, action: (int, int), state=None) -> (int, str):
+    def do(self, action: tuple[int, int], state=None) -> tuple[int, str]:
         move = ACTION_MOVE[action]
         pos_X, pos_Y = self.__pacman
         new_position = (pos_X + move[0], pos_Y + move[1])
@@ -157,37 +155,49 @@ class Environment:
         self.update(new_position)
         return reward, repr(self.__state)
 
-        @property
-        def state(self):
-            return self.__state
+    @property
+    def state(self):
+        return self.__state
 
-        @property
-        def goal(self):
-            return self.__goal
+    @property
+    def start(self):
+        return self.__init_position
 
-        @property
-        def height(self):
-            return self.__rows
+    @property
+    def height(self):
+        return self.__rows
 
-        @property
-        def width(self):
-            return self.__cols
+    @property
+    def width(self):
+        return self.__cols
 
-        @property
-        def is_wall(self, state):
-            return self.__states[state] == MAP_WALL
+    @property
+    def is_wall(self, state):
+        return self.__states[state] == MAP_WALL
 
-        """
-        def print(self, agent):
-            res = ''
-            for row in range(self.__rows):
-                for col in range(self.__cols):
-                    state = (row, col)
-                    if state == agent.state:
-                        res += 'A'
-                    else:
-                        res += self.__states[(row, col)]
+    @property
+    def walls(self):
+        return self.__walls
 
-                res += '\n'
-            print(res)
-        """
+    @property
+    def ghosts(self):
+        return self.__ghosts
+
+    @property
+    def gums(self):
+        return self.__gums
+
+    """
+    def print(self, agent):
+        res = ''
+        for row in range(self.__rows):
+            for col in range(self.__cols):
+                state = (row, col)
+                if state == agent.state:
+                    res += 'A'
+                else:
+                    res += self.__states[(row, col)]
+
+            res += '\n'
+        print(res)
+    """
