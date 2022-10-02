@@ -2,7 +2,7 @@ from random import random
 from environment.metrics import *
 from enum import Enum
 
-from radars import ShortRangeRadar, GhostRadar
+from environment.radars import ShortRangeRadar, GhostRadar
 
 MAP_WALL = '#'
 MAP_GUM = '.'
@@ -11,7 +11,7 @@ MAP_EMPTY = ' '
 MAP_INKY = 'I'
 MAP_BLINKY = 'B'
 MAP_CLYDE = 'C'
-MAP_PINKY = 'P'
+MAP_PINKY = 'R'
 MAP_GHOSTS = [MAP_INKY, MAP_BLINKY, MAP_CLYDE, MAP_PINKY]
 
 ACTION_MOVE = {
@@ -108,7 +108,9 @@ class Environment:
         self.__wall_radar = None
         self.__state = None
 
-        for line in str_map.strip().split('\n'):
+        a = str_map
+        b = str_map.split('\n')
+        for line in str_map.split('\n'):
             for item in line:
                 if item == MAP_GUM:
                     self.__gums.append((row, col))
@@ -116,7 +118,7 @@ class Environment:
                     self.__walls.append((row, col))
                 elif item in MAP_GHOSTS:
                     self.__ghosts.append((row, col))
-                elif item in MAP_PACMAN:
+                elif item == MAP_PACMAN:
                     self.__pacman = (row, col)
                     self.__init_position = (row, col)
 
@@ -174,37 +176,41 @@ class Environment:
 
         return self.__state, reward
 
-        @property
-        def state(self):
-            return self.__state
+    @property
+    def state(self):
+        return self.__state
 
-        @property
-        def goal(self):
-            return self.__goal
+    @property
+    def start(self):
+        return self.__init_position
 
-        @property
-        def height(self):
-            return self.__rows
+    @property
+    def height(self):
+        return self.__rows
 
-        @property
-        def width(self):
-            return self.__cols
+    @property
+    def width(self):
+        return self.__cols
 
-        @property
-        def is_wall(self, state):
-            return self.__states[state] == MAP_WALL
+    @property
+    def is_wall(self, state):
+        return self.__states[state] == MAP_WALL
 
-        """
-        def print(self, agent):
-            res = ''
-            for row in range(self.__rows):
-                for col in range(self.__cols):
-                    state = (row, col)
-                    if state == agent.state:
-                        res += 'A'
-                    else:
-                        res += self.__states[(row, col)]
+    @property
+    def walls(self):
+        return self.__walls
 
-                res += '\n'
-            print(res)
-        """
+    """
+    def print(self, agent):
+        res = ''
+        for row in range(self.__rows):
+            for col in range(self.__cols):
+                state = (row, col)
+                if state == agent.state:
+                    res += 'A'
+                else:
+                    res += self.__states[(row, col)]
+
+            res += '\n'
+        print(res)
+    """

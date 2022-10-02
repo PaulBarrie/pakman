@@ -1,5 +1,5 @@
 import numpy as np
-from metrics import *
+from environment.metrics import *
 
 class ShortRangeRadar:
     @staticmethod
