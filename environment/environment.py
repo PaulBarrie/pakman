@@ -200,6 +200,14 @@ class Environment:
     def walls(self):
         return self.__walls
 
+    @property
+    def ghosts(self):
+        return self.__ghosts
+
+    @property
+    def gums(self):
+        return self.__gums
+
     """
     def print(self, agent):
         res = ''
