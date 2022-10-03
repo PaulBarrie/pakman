@@ -155,6 +155,9 @@ class Environment:
         self.update(new_position)
         return reward, repr(self.__state)
 
+    def is_wall(self, coordinates: tuple[int, int]) -> bool:
+        return coordinates in self.__walls
+
     @property
     def state(self):
         return self.__state
@@ -172,12 +175,12 @@ class Environment:
         return self.__cols
 
     @property
-    def is_wall(self, state):
-        return self.__states[state] == MAP_WALL
-
-    @property
     def walls(self):
         return self.__walls
+
+    @property
+    def pacman(self):
+        return self.__pacman
 
     @property
     def ghosts(self):
