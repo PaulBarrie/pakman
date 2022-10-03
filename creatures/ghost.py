@@ -1,7 +1,7 @@
 from creatures.chase_behaviour import ChaseBehaviour
 from creatures.scared_behaviour import ScaredBehaviour
-from environment.environment import ACTION_MOVE, Environment
-from environment.metrics import ActionMoves
+from environment.actions import Actions
+from environment.environment import Environment
 
 
 class Ghost:
@@ -35,16 +35,9 @@ class Ghost:
         pass
 
     def _best_action(self) -> tuple[int, int]:
-        available_actions = [
-            ACTION_MOVE[ActionMoves.N],
-            ACTION_MOVE[ActionMoves.W],
-            ACTION_MOVE[ActionMoves.E],
-            ACTION_MOVE[ActionMoves.S],
-        ]
-
         legal_actions: tuple[int, int] = list(filter(
             lambda action: (not self.__env.is_wall(self._apply_action(action))),
-            available_actions
+            Actions.as_list()
         ))
         if (self.__is_scared):
             return self.__scared_behaviour.calculate_best_move(
