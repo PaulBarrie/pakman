@@ -1,7 +1,6 @@
 from __future__ import annotations
 from enum import Enum
-from this import d
-from metrics import ActionMoves
+from directions import Direction
 
 class Action(tuple[int, int], Enum):
     UP = (-1, 0)
@@ -9,29 +8,29 @@ class Action(tuple[int, int], Enum):
     LEFT = (0, -1)
     RIGHT = (0, 1)
 
-    def to_direction(self) -> str:
+    def to_direction(self) -> Direction:
         if self == Action.UP:
-            return ActionMoves.N
+            return Direction.NORTH
         if self == Action.DOWN:
-            return ActionMoves.S
+            return Direction.SOUTH
         if self == Action.LEFT:
-            return ActionMoves.O
-        return ActionMoves.E
+            return Direction.WEST
+        return Direction.EAST
 
     @staticmethod
-    def from_direction(direction: str) -> Action:
-        if direction == ActionMoves.N:
+    def from_direction(direction: Direction) -> Action:
+        if direction == Direction.NORTH:
             return Action.UP
-        if direction == ActionMoves.S:
+        if direction == Direction.SOUTH:
             return Action.DOWN
-        if direction == ActionMoves.O:
+        if direction == Direction.WEST:
             return Action.LEFT
-        if direction == ActionMoves.E:
+        if direction == Direction.EAST:
             return Action.RIGHT
         
         raise ValueError("Invalid direction")
 
 
     @staticmethod
-    def as_list() -> list[tuple[int, int]]:
+    def as_list() -> list[Action]:
         return [Action.UP, Action.DOWN, Action.LEFT, Action.RIGHT]

@@ -1,9 +1,8 @@
 # allow type hint for methods 
 # returning a new instance of their own class
 from __future__ import annotations
-
-from environment.metrics import ActionMoves
-from environment.actions import Action
+from game.actions import Action
+from game.directions import Direction
 
 class Position:
     @property
@@ -15,10 +14,10 @@ class Position:
         return self.__column
 
     @property
-    def direction(self) -> str:
+    def direction(self) -> Direction:
         return self.__direction
 
-    def __init__(self, row: int, column: int, direction: str) -> None:
+    def __init__(self, row: int, column: int, direction: Direction) -> None:
         self.__row = row
         self.__column = column
         self.__direction = direction

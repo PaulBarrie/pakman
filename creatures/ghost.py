@@ -1,8 +1,8 @@
-from creatures.agent import IAgent
+from game.agent import IAgent
 from creatures.chase_behaviour import ChaseBehaviour
-from creatures.position import Position
+from game.position import Position
 from creatures.scared_behaviour import ScaredBehaviour
-from environment.actions import Actions
+from game.actions import Actions
 from environment.environment import Environment
 
 

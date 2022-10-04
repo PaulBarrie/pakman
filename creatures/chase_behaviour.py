@@ -1,13 +1,14 @@
-from creatures.agent import IAgent
-from creatures.position import Position
+from game.actions import Action
+from game.agent import IAgent
+from game.position import Position
 
 class ChaseBehaviour:
 	def calculate_best_move(
 		self, 
 		target: IAgent, 
 		current_position: Position, 
-		actions: list[tuple[int, int]]
-	) -> tuple[int, int]:
+		actions: list[Action]
+	) -> Action:
 		raise NotImplementedError()
 
 class AggressiveChaseBehaviour(ChaseBehaviour):
@@ -15,8 +16,8 @@ class AggressiveChaseBehaviour(ChaseBehaviour):
         self, 
         target: IAgent, 
         current_position: Position, 
-        actions: list[tuple[int, int]]
-    ) -> tuple[int, int]:
+        actions: list[Action]
+    ) -> Action:
         return sorted(
             actions,
             key = lambda action: \
@@ -29,8 +30,8 @@ class AmbushChaseBehaviour(ChaseBehaviour):
         self, 
         target: IAgent, 
         current_position: Position, 
-        actions: list[tuple[int, int]]
-    ) -> tuple[int, int]:
+        actions: list[Action]
+    ) -> Action:
         targeted_position = target.position.follow_direction()
         return sorted(
             actions,
