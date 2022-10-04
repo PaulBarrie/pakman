@@ -23,6 +23,11 @@ class Position:
         self.__column = column
         self.__direction = direction
 
+    def __eq__(self, __o: object) -> bool:
+        return isinstance(__o, Position) \
+            and self.__row == __o.row \
+            and self.__column == __o.column
+
     def get_distance(self, other: Position) -> int:
         return abs(self.__row - other.row) + abs(self.__column - other.column)
 
