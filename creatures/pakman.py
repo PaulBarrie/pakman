@@ -1,6 +1,6 @@
-from core_agent import CoreAgent
-from position import Position
-from directions import Direction
+from core_game.core_agent import CoreAgent
+from core_game.position import Position
+from core_game.directions import Direction
 
 
 # should be derived into KeyboardPakman, QTablePakman and NeuronsPakman
