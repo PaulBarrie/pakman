@@ -1,8 +1,8 @@
 # allow type hint for methods 
 # returning a new instance of their own class
 from __future__ import annotations
-from game.actions import Action
-from game.directions import Direction
+from core_game.actions import Action
+from core_game.directions import Direction
 
 class Position:
     @property

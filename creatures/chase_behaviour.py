@@ -1,6 +1,6 @@
-from game.actions import Action
-from game.agent import IAgent
-from game.position import Position
+from core_game.actions import Action
+from core_game.agent import IAgent
+from core_game.position import Position
 
 class ChaseBehaviour:
 	def calculate_best_move(
