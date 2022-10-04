@@ -37,5 +37,5 @@ class AmbushChaseBehaviour(ChaseBehaviour):
             actions,
             key = lambda action: \
                 current_position.apply_action(action)
-                .get_distance(targeted_position)
+                    .get_distance(targeted_position)
         )[0]
