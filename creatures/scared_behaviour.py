@@ -1,12 +1,12 @@
 from core_game.actions import Action
-from core_game.agent import IAgent
+from core_game.core_agent import CoreAgent
 from core_game.position import Position
 
 
 class ScaredBehaviour:
     def calculate_best_move(
         self, 
-        target: IAgent, 
+        target: CoreAgent, 
         current_position: Position, 
         actions: list[Action]
     ) -> Action:
@@ -15,7 +15,7 @@ class ScaredBehaviour:
 class DefaultScaredBehaviour(ScaredBehaviour):
     def calculate_best_move(
         self, 
-        target: IAgent, 
+        target: CoreAgent, 
         current_position: Position, 
         actions: list[Action]
     ) -> Action:

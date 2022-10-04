@@ -1,12 +1,12 @@
 from position import Position
 
-class IAgent:
+class CoreAgent:
     @property
-    def position(self):
-        return self.__position
+    def position(self) -> Position:
+        return self._position
 
     def __init__(self, initial_position: Position):
-        self.__position = initial_position
+        self._position = initial_position
 
     def step(self) -> None:
         raise NotImplemented()

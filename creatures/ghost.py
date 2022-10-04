@@ -1,4 +1,4 @@
-from core_game.agent import IAgent
+from core_game.core_agent import CoreAgent
 from creatures.chase_behaviour import ChaseBehaviour
 from core_game.position import Position
 from creatures.scared_behaviour import ScaredBehaviour
@@ -6,7 +6,7 @@ from core_game.actions import Action
 from environment.environment import Environment
 
 
-class Ghost(IAgent):
+class Ghost(CoreAgent):
     @property
     def is_scared(self) -> bool:
         return self.__is_scared
@@ -27,25 +27,24 @@ class Ghost(IAgent):
 
     def step(self) -> None:
         optimum_action = self._best_action()
-        self.__position = self.__position.apply_action(optimum_action)
+        self._position = self._position.apply_action(optimum_action)
 
         # TODO handle collision with Pacman
-        pass
 
     def _best_action(self) -> tuple[int, int]:
         legal_actions = list(filter(
-            lambda action: (not self.__env.is_wall(self.__position.apply_action(action))),
+            lambda action: (not self.__env.is_wall(self._position.apply_action(action))),
             Action.as_list()
         ))
         if (self.__is_scared):
             return self.__scared_behaviour.calculate_best_move(
                 self.__env.pacman,
-                self.__position,
+                self._position,
                 legal_actions
             )
 
         return self.__chase_behaviour.calculate_best_move(
             self.__env.pacman,
-            self.__position,
+            self._position,
             legal_actions
         )
