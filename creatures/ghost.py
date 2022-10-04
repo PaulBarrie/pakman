@@ -2,7 +2,7 @@ from game.agent import IAgent
 from creatures.chase_behaviour import ChaseBehaviour
 from game.position import Position
 from creatures.scared_behaviour import ScaredBehaviour
-from game.actions import Actions
+from game.actions import Action
 from environment.environment import Environment
 
 
@@ -33,9 +33,9 @@ class Ghost(IAgent):
         pass
 
     def _best_action(self) -> tuple[int, int]:
-        legal_actions: tuple[int, int] = list(filter(
+        legal_actions = list(filter(
             lambda action: (not self.__env.is_wall(self.__position.apply_action(action))),
-            Actions.as_list()
+            Action.as_list()
         ))
         if (self.__is_scared):
             return self.__scared_behaviour.calculate_best_move(

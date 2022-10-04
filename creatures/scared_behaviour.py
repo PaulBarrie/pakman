@@ -1,3 +1,7 @@
+from game.actions import Action
+from game.position import Position
+
+
 class ScaredBehaviour:
 	def __init__(self):
 		pass
@@ -5,7 +9,7 @@ class ScaredBehaviour:
 	def calculate_best_move(
 		self, 
 		target, 
-		current_position: tuple[int, int], 
-		actions: list[tuple[int, int]]
-	) -> tuple[int, int]:
+		current_position: Position, 
+		actions: list[Action]
+	) -> Action:
 		raise NotImplementedError()
