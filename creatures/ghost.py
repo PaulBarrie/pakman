@@ -25,26 +25,26 @@ class Ghost(CoreAgent):
         self.__scared_behaviour = scared_behaviour
         self.__is_scared = is_scared
 
-    def step(self) -> None:
+    def step(self) -> tuple[Action, float]:
         optimum_action = self._best_action()
         self._position = self._position.apply_action(optimum_action)
+        return (optimum_action, -1.0)
 
-        # TODO handle collision with Pacman
-
-    def _best_action(self) -> tuple[int, int]:
+    def _best_action(self) -> Action:
         legal_actions = list(filter(
             lambda action: (not self.__env.is_wall(self._position.apply_action(action))),
             Action.as_list()
         ))
+
         if (self.__is_scared):
             return self.__scared_behaviour.calculate_best_move(
-                self.__env.pacman,
+                self.__env.pakman_position,
                 self._position,
                 legal_actions
             )
 
         return self.__chase_behaviour.calculate_best_move(
-            self.__env.pacman,
+            self.__env.pakman_position,
             self._position,
             legal_actions
         )
