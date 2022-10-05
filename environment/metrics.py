@@ -1,11 +1,14 @@
-class Distances:
-    DIST_1 = "1"
-    DIST_2 = "2"
-    DIST_3 = "SE3"
+from __future__ import annotations
+from enum import Enum
+
+class Distance(str, Enum):
+    ONE = "1"
+    TWO = "2"
+    THREE_OR_MORE = "SE3"
 
     @staticmethod
-    def list():
-        return [Distances.DIST_1, Distances.DIST_2, Distances.DIST_3]
+    def list() -> list[Distance]:
+        return [Distance.ONE, Distance.TWO, Distance.THREE_OR_MORE]
 
 
 class GhostDirections:
