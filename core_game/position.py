@@ -1,8 +1,8 @@
 # allow type hint for methods 
 # returning a new instance of their own class
 from __future__ import annotations
-from actions import Action
-from directions import Direction
+from core_game.actions import Action
+from core_game.directions import Direction
 
 class Position:
     @property
@@ -17,7 +17,7 @@ class Position:
     def direction(self) -> Direction:
         return self.__direction
 
-    def __init__(self, row: int, column: int, direction: Direction) -> None:
+    def __init__(self, row: int, column: int, direction: Direction = Direction.WEST) -> None:
         self.__row = row
         self.__column = column
         self.__direction = direction

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from enum import Enum
-from directions import Direction
+from core_game.directions import Direction
 
 class Action(tuple[int, int], Enum):
     UP = (-1, 0)

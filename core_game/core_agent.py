@@ -1,5 +1,5 @@
 from actions import Action
-from position import Position
+from core_game.position import Position
 
 class CoreAgent:
     @property
