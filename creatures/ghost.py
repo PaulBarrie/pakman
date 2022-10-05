@@ -5,7 +5,7 @@ from creatures.scared_behaviour import ScaredBehaviour
 from core_game.actions import Action
 from environment.environment import Environment
 
-
+# Inky = Ghost(env, env.ghosts[INKY])
 class Ghost(CoreAgent):
     @property
     def is_scared(self) -> bool:

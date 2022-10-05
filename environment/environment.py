@@ -22,9 +22,9 @@ REWARD_WALL = -2 * REWARD_GHOST
 
 
 class Environment:
-    # @property
-    # def state(self):
-    #     return self.__state
+    @property
+    def state(self) -> State:
+        return self.__state
 
     # @property
     # def start(self):
@@ -54,7 +54,16 @@ class Environment:
     def gums(self) -> list[Position]:
         return self.__gums
 
-    def __init__(self, width: int, height: int, gums: list[Position], walls: list[Position], pakman_position: Position, ghost_positions: dict[str, Position]) -> None:
+    def __init__(
+        self, width: int, 
+        height: int, 
+        gums: list[Position], 
+        walls: list[Position], 
+        pakman_position: Position, 
+        ghost_positions: dict[str, Position], 
+        initial_state: State
+    ) -> None:
+
         self.__width = width
         self.__height = height
         self.__gums = gums
@@ -62,6 +71,7 @@ class Environment:
         self.__initial_pakman_position = pakman_position
         self.__pakman_position = pakman_position
         self.__ghost_positions = ghost_positions
+        self.__state = initial_state
 
     @staticmethod
     def from_str_map(str_map: str) -> Environment:
@@ -94,26 +104,24 @@ class Environment:
 
     def do(self, action: Action, state=None) -> tuple[Position, State, float, bool]:
         next_position = self.__pakman_position.apply_action(action)
-        next_state = self._calculate_state(next_position)
+        next_state = State.compute_state(self.__ghost_positions, next_position, self.__gums, self.__walls)
 
         if next_position in self.__ghosts:
             self.__pakman_position = self.__initial_pakman_position
-            return (self.__initial_pakman_position, self._calculate_state(self.__initial_pakman_position), REWARD_GHOST, True)
+            reset_state = State.compute_state(self.__ghost_positions, self.__pakman_position, self.__gums, self.__walls)
+            return (self.__initial_pakman_position, reset_state, REWARD_GHOST, True)
 
         if next_position in self.__walls:
             return (self.__pakman_position, state, REWARD_WALL, False)
 
         if next_position in self.__gums:
-            self.__pakman_position = next_position
             self.__gums.remove(next_position)
-            return (next_position, next_state, REWARD_GUM, False)
 
         self.__pakman_position = next_position
-        return (next_position, next_state, REWARD_DEFAULT)
-        
+        return (next_position, next_state, REWARD_DEFAULT, False)
 
-    def _calculate_state(self, position: Position) -> State:
-        raise NotImplemented()
+    def update_ghost_positions(self, ghost_positions: dict[str, Position]) -> None:
+        self.__ghost_positions = ghost_positions
             
     def is_wall(self, coordinates: tuple[int, int]) -> bool:
         return coordinates in self.__walls

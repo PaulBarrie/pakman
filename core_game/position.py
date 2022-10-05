@@ -13,14 +13,9 @@ class Position:
     def column(self) -> int:
         return self.__column
 
-    @property
-    def direction(self) -> Direction:
-        return self.__direction
-
-    def __init__(self, row: int, column: int, direction: Direction = Direction.WEST) -> None:
+    def __init__(self, row: int, column: int) -> None:
         self.__row = row
         self.__column = column
-        self.__direction = direction
 
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, Position) \
@@ -33,5 +28,5 @@ class Position:
     def apply_action(self, action: Action) -> Position:
         return Position(self.__row + action[0], self.__column + action[1], action.to_direction())
 
-    def follow_direction(self) -> Position:
-        return self.apply_action(Action.from_direction(self.__direction))
+    def follow_direction(self, direction: Direction) -> Position:
+        return self.apply_action(Action.from_direction(direction))

@@ -10,28 +10,36 @@ class Distance(str, Enum):
     def list() -> list[Distance]:
         return [Distance.ONE, Distance.TWO, Distance.THREE_OR_MORE]
 
-
-class GhostDirections:
-    N = "N"
-    S = "S"
-    E = "E"
-    O = "O"
-    NO = "NO"
-    NE = "NE"
-    SO = "SO"
-    SE = "SE"
-
     @staticmethod
-    def list():
-        return [GhostDirections.NO, GhostDirections.NE, GhostDirections.SE, GhostDirections.SO]
+    def int_to_distance(numeric_distance: int) -> Distance:
+        if numeric_distance == 1:
+            return Distance.ONE
+        if numeric_distance == 2:
+            return Distance.TWO
+        return Distance.THREE_OR_MORE
 
 
-class ActionMoves:
-    N = "N"
-    S = "S"
-    O = "O"
-    E = "E"
+# class GhostDirections:
+#     N = "N"
+#     S = "S"
+#     E = "E"
+#     O = "O"
+#     NO = "NO"
+#     NE = "NE"
+#     SO = "SO"
+#     SE = "SE"
 
-    @staticmethod
-    def list():
-        return [ActionMoves.N, ActionMoves.S, ActionMoves.O, ActionMoves.E]
+#     @staticmethod
+#     def list():
+#         return [GhostDirections.NO, GhostDirections.NE, GhostDirections.SE, GhostDirections.SO]
+
+
+# class ActionMoves:
+#     N = "N"
+#     S = "S"
+#     O = "O"
+#     E = "E"
+
+#     @staticmethod
+#     def list():
+#         return [ActionMoves.N, ActionMoves.S, ActionMoves.O, ActionMoves.E]
