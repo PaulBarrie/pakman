@@ -13,7 +13,7 @@ if __name__ == '__main__':
         environment.gums,
         environment.walls
     )
-    agent = QtablePakman(environment.initial_pakman_position, initial_state)
+    agent = QtablePakman(environment.initial_pakman_position, initial_state, environment)
     pakman = PakmanWindow(environment, agent)
     pakman.setup()
     arcade.run()

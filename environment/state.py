@@ -97,7 +97,7 @@ class GhostRadar:
             and self.__distance == __o.distance
 
     def __hash__(self) -> int:
-        return hash(self.__north, self.__south, self.__west, self.__east, self.__distance)
+        return hash((self.__north, self.__south, self.__west, self.__east, self.__distance))
 
     @staticmethod
     def compute_radar(pakman_position: Position, ghost_positions: list[Position]) -> GhostRadar:
@@ -175,5 +175,5 @@ class State:
 
         return f'ghost: {ghost_state}, gums: {gum_state}, walls: {wall_state}'
 
-    def __state_str(self, state: dict) -> str:
-        return State.STATE_VAL_SEPARATOR.join([key for key, val in state.items() if val == 1])
+    # def __state_str(self, state: dict) -> str:
+    #     return State.STATE_VAL_SEPARATOR.join([key for key, val in state.items() if val == 1])

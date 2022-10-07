@@ -26,11 +26,12 @@ class QtablePakman(Pakman):
     def temperature(self) -> float:
         return self.__temperature
 
-    def __init__(self, initial_position: Position, initial_state: State, alpha=1, gamma=0.8, cooling_rate=0.999) -> None:
+    def __init__(self, initial_position: Position, initial_state: State, env: Environment, alpha=1, gamma=0.8, cooling_rate=0.999) -> None:
         super().__init__(initial_position)
 
         self.__temperature = 0.0
         self.__score = 0.0
+        self.__env = env
         self.__initial_state = initial_state
         self.__state = deepcopy(initial_state)
         self.__qtable: dict[
@@ -59,14 +60,14 @@ class QtablePakman(Pakman):
             self.__temperature *= self.__cooling_rate
             return choice(Action.as_list())
 
-        actions = self.__qtable[self.__state]
+        actions = self.__qtable_get_or_create(self.__state)
         return max(actions, key=actions.get)
 
-    def step(self, env: Environment) -> tuple[Action, float]:
+    def step(self) -> tuple[Action, float]:
         action = self._best_action()
 
-        self._position, state, reward, isDead = env.do(action, self.__state, self.position)
-        maxQ = max(self.__qtable[state].values())
+        self._position, state, reward, isDead = self.__env.do(action, self.__state, self.position)
+        maxQ = max(self.__qtable_get_or_create(state).values())
         delta = self.__alpha * (reward + self.__gamma * maxQ - self.__qtable[self.__state][action])
         self.__qtable[self.__state][action] += delta
 
@@ -76,8 +77,14 @@ class QtablePakman(Pakman):
         if isDead:
             self.die()
         else:
-            self.__direction = action.to_direction()
-        return action, reward
+            self._direction = action.to_direction()
+        return action, reward 
+
+    def __qtable_get_or_create(self, state: State) -> dict[Action, float]:
+        return self.__qtable.setdefault(
+            state,
+            { k: 0.0 for k in Action.as_list() }
+        )
 
     def load(self, filename = "qtable_pakman.dump") -> None:
         with open(filename, 'rb') as file:

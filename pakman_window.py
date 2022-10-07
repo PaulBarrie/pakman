@@ -1,4 +1,5 @@
 import arcade
+from core_game.ghost import Ghost
 from core_game.pakman import Pakman
 
 from core_game.position import Position
@@ -16,6 +17,8 @@ class PakmanWindow(arcade.Window):
                          SPRITE_SIZE * environment.height, "Pakman")
         self.__agent = agent
         self.__environment = environment
+        self.__agents = (agent, environment.blinky, environment.inky, environment.pinky, environment.clyde)
+        self.__current_agent_index = 0
 
     def setup(self):
         self.__walls = arcade.SpriteList()
@@ -63,6 +66,32 @@ class PakmanWindow(arcade.Window):
     def on_draw(self):
         arcade.start_render()
         self.__walls.draw()
+        self.__gums.draw()
         self.__ghosts.draw()
         self.__pacman.draw()
-        self.__gums.draw()
+
+    def on_update(self, delta_time):
+        moving_agent = self.__agents[self.__current_agent_index]
+
+        if isinstance(moving_agent, Ghost):
+            print("here")
+            moving_agent.step(self.__environment.walls, self.__agent)
+            spr = self.__ghosts[self.__current_agent_index - 1]
+            spr.center_x, spr.center_y = self.position_to_xy(moving_agent.position)
+
+            self.__current_agent_index = (self.__current_agent_index + 1) % len(self.__agents)
+            return
+
+        # still alive and uneaten gums left on the map
+        if self.__agent.lives > 0 and len(self.__environment.gums) > 0:
+            self.__agent.step()
+            print(self.__agent.position.row, self.__agent.position.column)
+        self.__pacman.center_x, self.__pacman.center_y = self.position_to_xy(self.__agent.position)
+        self.__current_agent_index = (self.__current_agent_index + 1) % len(self.__agents)
+        # else:
+        #     # self.__sound.play()
+        #     self.__agent.reset()
+        #     self.__iteration += 1
+
+        #     self.__player.center_x, self.__player.center_y = \
+        #         self.state_to_xy(self.__agent.state)

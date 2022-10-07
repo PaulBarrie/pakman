@@ -29,7 +29,7 @@ class Ghost:
 
     def step(self, walls: list[Position], pakman: Pakman) -> tuple[Action, float]:
         optimum_action = self._best_action(walls, pakman.position)
-        self.__position = self._position.apply_action(optimum_action)
+        self.__position = self.__position.apply_action(optimum_action)
 
         if self.__position == pakman.position:
             pakman.die()
@@ -38,7 +38,7 @@ class Ghost:
 
     def _best_action(self, walls: list[Position], pakman_position: Position) -> Action:
         legal_actions = list(filter(
-            lambda action: not self._position.apply_action(action) in walls,
+            lambda action: not self.__position.apply_action(action) in walls,
             Action.as_list()
         ))
 
