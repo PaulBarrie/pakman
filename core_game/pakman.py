@@ -10,10 +10,6 @@ class Pakman:
         return self.__position
 
     @property
-    def initial_position(self) -> Position:
-        return self.__initial_position
-
-    @property
     def lives(self) -> int:
         return self.__lives
 
@@ -22,7 +18,6 @@ class Pakman:
         return self.__direction
 
     def __init__(self, initial_position: Position, initial_direction = Direction.WEST, lives: int = 3) -> None:
-        self.__initial_position = initial_position
         self.__position = initial_position
         self.__direction = initial_direction
         self.__lives = lives
