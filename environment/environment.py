@@ -90,8 +90,6 @@ class Environment:
         self.__gums = gums
         self.__walls = walls
         self.__initial_pakman_position = pakman_position
-        self.__pakman_position = pakman_position
-        self.__initial_pakman_position = pakman_position
         self.__blinky = blinky
         self.__inky = inky
         self.__pinky = pinky
@@ -136,22 +134,20 @@ class Environment:
 
         return Environment(col, row, gums, walls, pakman_position, blinky, inky, pinky, clyde)
 
-    def do(self, action: Action, state=None) -> tuple[Position, State, float, bool]:
-        next_position = self.__pakman_position.apply_action(action)
+    def do(self, action: Action, state: State, position: Position) -> tuple[Position, State, float, bool]:
+        next_position = position.apply_action(action)
         next_state = State.compute_state(self.ghost_positions, next_position, self.__gums, self.__walls)
 
         if next_position in self.__ghosts:
-            self.__pakman_position = self.__initial_pakman_position
-            reset_state = State.compute_state(self.ghost_positions, self.__pakman_position, self.__gums, self.__walls)
+            reset_state = State.compute_state(self.ghost_positions, position, self.__gums, self.__walls)
             return (self.__initial_pakman_position, reset_state, REWARD_GHOST, True)
 
         if next_position in self.__walls:
-            return (self.__pakman_position, state, REWARD_WALL, False)
+            return (position, state, REWARD_WALL, False)
 
         if next_position in self.__gums:
             self.__gums.remove(next_position)
 
-        self.__pakman_position = next_position
         return (next_position, next_state, REWARD_DEFAULT, False)
 
     """

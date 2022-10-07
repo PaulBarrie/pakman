@@ -1,4 +1,3 @@
-from sys import platlibdir
 from core_game.chase_behaviour import ChaseBehaviour
 from core_game.pakman import Pakman
 from core_game.position import Position
