@@ -26,7 +26,7 @@ class Position:
         return abs(self.__row - other.row) + abs(self.__column - other.column)
 
     def apply_action(self, action: Action) -> Position:
-        return Position(self.__row + action[0], self.__column + action[1], action.to_direction())
+        return Position(self.__row + action[0], self.__column + action[1])
 
     def follow_direction(self, direction: Direction) -> Position:
         return self.apply_action(Action.from_direction(direction))

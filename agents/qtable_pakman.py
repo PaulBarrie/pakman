@@ -75,7 +75,8 @@ class QtablePakman(Pakman):
 
         if isDead:
             self.die()
-
+        else:
+            self.__direction = action.to_direction()
         return action, reward
 
     def load(self, filename = "qtable_pakman.dump") -> None:

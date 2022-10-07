@@ -29,8 +29,8 @@ class Environment:
         return self.__state
 
     @property
-    def pakman_initial_position(self) -> Position:
-        return self.__pakman_initial_position
+    def initial_pakman_position(self) -> Position:
+        return self.__initial_pakman_position
 
     @property
     def blinky(self) -> Ghost:
