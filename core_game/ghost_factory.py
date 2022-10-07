@@ -7,16 +7,16 @@ from core_game.scared_behaviour import DefaultScaredBehaviour
 class GhostFactory:
     @staticmethod
     def spawn_blinky(initial_position: Position) -> Ghost:
-        return Ghost(initial_position, DefaultScaredBehaviour(), AggressiveChaseBehaviour())
+        return Ghost(initial_position, AggressiveChaseBehaviour(), DefaultScaredBehaviour(),)
 
     @staticmethod
     def spawn_inky(initial_position: Position) -> Ghost:
-        return Ghost(initial_position, DefaultScaredBehaviour(), AmbushChaseBehaviour())
+        return Ghost(initial_position, AmbushChaseBehaviour(), DefaultScaredBehaviour())
 
     @staticmethod
     def spawn_pinky(initial_position: Position) -> Ghost:
-        return Ghost(initial_position, DefaultScaredBehaviour(), AggressiveChaseBehaviour())
+        return Ghost(initial_position, AggressiveChaseBehaviour(), DefaultScaredBehaviour())
 
     @staticmethod
     def spawn_clyde(initial_position: Position) -> Ghost:
-        return Ghost(initial_position, DefaultScaredBehaviour(), AmbushChaseBehaviour())
+        return Ghost(initial_position, AmbushChaseBehaviour(), DefaultScaredBehaviour())

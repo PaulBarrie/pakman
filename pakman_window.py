@@ -17,12 +17,14 @@ class PakmanWindow(arcade.Window):
                          SPRITE_SIZE * environment.height, "Pakman")
         self.__agent = agent
         self.__environment = environment
-        self.__agents = (agent, environment.blinky, environment.inky, environment.pinky, environment.clyde)
         self.__current_agent_index = 0
 
     def setup(self):
         self.__walls = arcade.SpriteList()
-        self.__ghosts = arcade.SpriteList()
+        self.__blinky = arcade.Sprite()
+        self.__inky = arcade.Sprite()
+        self.__pinky = arcade.Sprite()
+        self.__clyde = arcade.Sprite()
         self.__gums = arcade.SpriteList()
 
         for wall in self.__environment.walls:
@@ -32,19 +34,19 @@ class PakmanWindow(arcade.Window):
 
         sprite = arcade.Sprite('static/blinky.png')
         sprite.center_x, sprite.center_y = self.position_to_xy(self.__environment.blinky.position)
-        self.__ghosts.append(sprite)
+        self.__blinky = sprite
 
         sprite = arcade.Sprite('static/inky.png')
         sprite.center_x, sprite.center_y = self.position_to_xy(self.__environment.inky.position)
-        self.__ghosts.append(sprite)
+        self.__inky = sprite
 
         sprite = arcade.Sprite('static/pinky.png')
         sprite.center_x, sprite.center_y = self.position_to_xy(self.__environment.pinky.position)
-        self.__ghosts.append(sprite)
+        self.__pinky = sprite
 
         sprite = arcade.Sprite('static/clyde.png')
         sprite.center_x, sprite.center_y = self.position_to_xy(self.__environment.clyde.position)
-        self.__ghosts.append(sprite)
+        self.__clyde = sprite
 
         for gum in self.__environment.gums:
             sprite = arcade.Sprite('static/gum.png', GUM_SCALE)
@@ -67,31 +69,38 @@ class PakmanWindow(arcade.Window):
         arcade.start_render()
         self.__walls.draw()
         self.__gums.draw()
-        self.__ghosts.draw()
+        self.__blinky.draw()
+        self.__inky.draw()
+        self.__pinky.draw()
+        self.__clyde.draw()
         self.__pacman.draw()
 
-    def on_update(self, delta_time):
-        moving_agent = self.__agents[self.__current_agent_index]
+    def on_update(self, delta_time):          
+        if self.__current_agent_index == 1:
+            blinky = self.__environment.blinky
+            blinky.step(self.__environment.walls, self.__agent)
+            self.__blinky.center_x, self.__blinky.center_y = self.position_to_xy(blinky.position)
 
-        if isinstance(moving_agent, Ghost):
-            print("here")
-            moving_agent.step(self.__environment.walls, self.__agent)
-            spr = self.__ghosts[self.__current_agent_index - 1]
-            spr.center_x, spr.center_y = self.position_to_xy(moving_agent.position)
+        elif self.__current_agent_index == 2:
+            inky = self.__environment.inky
+            inky.step(self.__environment.walls, self.__agent)
+            self.__inky.center_x, self.__inky.center_y = self.position_to_xy(inky.position)
 
-            self.__current_agent_index = (self.__current_agent_index + 1) % len(self.__agents)
-            return
+        elif self.__current_agent_index == 3:
+            pinky = self.__environment.pinky
+            pinky.step(self.__environment.walls, self.__agent)
+            self.__pinky.center_x, self.__pinky.center_y = self.position_to_xy(pinky.position)
 
-        # still alive and uneaten gums left on the map
-        if self.__agent.lives > 0 and len(self.__environment.gums) > 0:
-            self.__agent.step()
-            print(self.__agent.position.row, self.__agent.position.column)
-        self.__pacman.center_x, self.__pacman.center_y = self.position_to_xy(self.__agent.position)
-        self.__current_agent_index = (self.__current_agent_index + 1) % len(self.__agents)
-        # else:
-        #     # self.__sound.play()
-        #     self.__agent.reset()
-        #     self.__iteration += 1
+        elif self.__current_agent_index == 4:
+            clyde = self.__environment.clyde
+            clyde.step(self.__environment.walls, self.__agent)
+            self.__clyde.center_x, self.__clyde.center_y = self.position_to_xy(clyde.position)
 
-        #     self.__player.center_x, self.__player.center_y = \
-        #         self.state_to_xy(self.__agent.state)
+        else: 
+            if self.__agent.lives > 0 and len(self.__environment.gums) > 0:
+                self.__agent.step()
+                self.__pacman.center_x, self.__pacman.center_y = self.position_to_xy(self.__agent.position)
+            else:
+                exit(0)
+
+        self.__current_agent_index = (self.__current_agent_index + 1) % 5
