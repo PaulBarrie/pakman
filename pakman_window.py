@@ -68,7 +68,14 @@ class PakmanWindow(arcade.Window):
     def on_draw(self):
         arcade.start_render()
         self.__walls.draw()
+
+        self.__gums.clear()
+        for gum in self.__environment.gums:
+            sprite = arcade.Sprite('static/gum.png', GUM_SCALE)
+            sprite.center_x, sprite.center_y = self.position_to_xy(gum)
+            self.__gums.append(sprite)
         self.__gums.draw()
+
         self.__blinky.draw()
         self.__inky.draw()
         self.__pinky.draw()
@@ -101,6 +108,7 @@ class PakmanWindow(arcade.Window):
                 self.__agent.step()
                 self.__pacman.center_x, self.__pacman.center_y = self.position_to_xy(self.__agent.position)
             else:
+                # reset env + pakman
                 exit(0)
 
         self.__current_agent_index = (self.__current_agent_index + 1) % 5

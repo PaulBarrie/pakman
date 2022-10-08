@@ -68,7 +68,8 @@ class QtablePakman(Pakman):
 
         self._position, state, reward, isDead = self.__env.do(action, self.__state, self.position)
         maxQ = max(self.__qtable_get_or_create(state).values())
-        delta = self.__alpha * (reward + self.__gamma * maxQ - self.__qtable[self.__state][action])
+        delta = self.__alpha * (reward + self.__gamma * maxQ - self.__qtable_get_or_create(self.__state)[action])
+        
         self.__qtable[self.__state][action] += delta
 
         self.__state = state
@@ -78,6 +79,8 @@ class QtablePakman(Pakman):
             self.die()
         else:
             self._direction = action.to_direction()
+        print(self.__qtable[self.__state])
+        print(f"chosen action is {action}")
         return action, reward 
 
     def __qtable_get_or_create(self, state: State) -> dict[Action, float]:
