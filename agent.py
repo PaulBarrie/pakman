@@ -23,7 +23,7 @@ class Agent:
     def reset(self, store_history=True):
         if store_history:
             self.__history.append(self.__score)
-        self.__state = self.__env.start
+        self.__env.reset()
         self.__score = 0
         self.__temperature = 0
 
@@ -35,15 +35,30 @@ class Agent:
             self.__temperature *= self.__cooling_rate
             return choice(ActionMoves().list())
         else:
+            if self.__state not in self.__qtable:
+                self.__qtable[self.__state] = {
+                    ActionMoves.N: 0,
+                    ActionMoves.E: 0,
+                    ActionMoves.S: 0,
+                    ActionMoves.O: 0
+                }
             q = self.__qtable[self.__state]
             return max(q, key=q.get)
 
     def step(self):
         action = self.best_action()
 
-        state, reward = self.__env.do(self.__state, action)
+        state, reward = self.__env.do(action)
+        if state not in self.__qtable:
+            self.__qtable[state] = {
+                ActionMoves.N: 0,
+                ActionMoves.E: 0,
+                ActionMoves.S: 0,
+                ActionMoves.O: 0
+            }
         maxQ = max(self.__qtable[state].values())
-        delta = self.__alpha * (reward + self.__gamma * maxQ - self.__qtable[self.__state][action])
+        delta = self.__alpha * (reward + self.__gamma *
+                                maxQ - self.__qtable[self.__state][action])
         self.__qtable[self.__state][action] += delta
 
         self.__state = state

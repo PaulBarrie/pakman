@@ -21,7 +21,7 @@ REWARD_GUM = 1
 REWARD_DEFAULT = -1
 NB_STATES = 2 ** 4 * 2 ** 4 * 8 * 4
 REWARD_GHOST = -NB_STATES
-REWARD_WALL = -2 * REWARD_GHOST
+REWARD_WALL = 2 * REWARD_GHOST
 
 
 class Ghost:
@@ -87,17 +87,20 @@ class Ghost:
 
 class Environment:
     def __init__(self, str_map):
+        self.__initial_map = str_map.strip()
+        self.reset()
+
+    def reset(self):
         row = 0
         col = 0
         self.__init_position = None
-        str_map = str_map.strip()
         self.__gums = []
         self.__ghosts = []
         self.__walls = []
         self.__pacman = None
         self.__state = None
 
-        for line in str_map.strip().split('\n'):
+        for line in self.__initial_map.split('\n'):
             for item in line:
                 if item == MAP_GUM:
                     self.__gums.append((row, col))
@@ -119,8 +122,7 @@ class Environment:
         self.__init_ghosts = self.__ghosts.copy()
         self.__init_pacman = self.__pacman
 
-        self.__state = State()
-        self.__state.update(self.__ghosts, self.__pacman, self.__gums, self.__walls)
+        self.__state = self.__init_pacman
 
         self.__rows = row
         self.__cols = len(line)
@@ -131,9 +133,8 @@ class Environment:
 
     def update(self, position):
         self.__pacman = position
-        self.__state.update(self.__ghosts, position, self.__gums, self.__walls)
 
-    def do(self, action: tuple[int, int], state=None) -> tuple[int, str]:
+    def do(self, action):
         move = ACTION_MOVE[action]
         pos_X, pos_Y = self.__pacman
         new_position = (pos_X + move[0], pos_Y + move[1])
@@ -141,7 +142,7 @@ class Environment:
         if new_position in self.__ghosts:
             reward = self.__reward_ghost
             self.__ghosts = self.__init_ghosts.copy()
-            self.__pacman = self.__init_pacman.copy()
+            self.__pacman = self.__init_pacman
             new_position = self.__init_position
         elif new_position in self.__walls:
             reward = self.__reward_wall
@@ -153,7 +154,7 @@ class Environment:
             reward = REWARD_DEFAULT
 
         self.update(new_position)
-        return reward, repr(self.__state)
+        return new_position, reward
 
     @property
     def state(self):
