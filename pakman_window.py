@@ -1,9 +1,11 @@
 import arcade
+from agents.qtable_pakman import QtablePakman
 from core_game.ghost import Ghost
 from core_game.pakman import Pakman
 
 from core_game.position import Position
 from environment.environment import Environment
+from environment.state import State
 
 SPRITE_SCALE = 0.25
 SPRITE_SIZE = round(128 * SPRITE_SCALE)
@@ -18,6 +20,7 @@ class PakmanWindow(arcade.Window):
         self.__agent = agent
         self.__environment = environment
         self.__current_agent_index = 0
+        self.__iteration = 0
 
     def setup(self):
         self.__walls = arcade.SpriteList()
@@ -81,6 +84,9 @@ class PakmanWindow(arcade.Window):
         self.__pinky.draw()
         self.__clyde.draw()
         self.__pacman.draw()
+        arcade.draw_text(f'#{self.__iteration} Score: {self.__agent.score} T°C: {round(self.__agent.temperature * 100, 2)}',
+                         10, 10,
+                         arcade.csscolor.WHITE, 20)
 
     def on_update(self, delta_time):          
         if self.__current_agent_index == 1:
@@ -108,7 +114,18 @@ class PakmanWindow(arcade.Window):
                 self.__agent.step()
                 self.__pacman.center_x, self.__pacman.center_y = self.position_to_xy(self.__agent.position)
             else:
-                # reset env + pakman
-                exit(0)
+                self.reset()
 
         self.__current_agent_index = (self.__current_agent_index + 1) % 5
+
+    def reset(self):
+        self.__iteration += 1
+        self.__environment = Environment.from_str_map(self.__environment.str_map)
+        initial_state = State.compute_state(
+            self.__environment.ghost_positions, 
+            self.__environment.initial_pakman_position,
+            self.__environment.gums,
+            self.__environment.walls
+        )
+        self.__agent = QtablePakman(self.__environment.initial_pakman_position, initial_state, self.__environment, self.__agent.qtable)
+        

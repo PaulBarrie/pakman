@@ -72,6 +72,10 @@ class Environment:
             self.__pinky.position, 
             self.__clyde.position
         ]
+    
+    @property
+    def str_map(self) -> str:
+        return self.__str_map
 
     def __init__(
         self, width: int, 
@@ -82,7 +86,8 @@ class Environment:
         blinky: Ghost,
         inky: Ghost,
         pinky: Ghost,
-        clyde: Ghost
+        clyde: Ghost,
+        str_map: str
     ) -> None:
 
         self.__width = width
@@ -94,6 +99,7 @@ class Environment:
         self.__inky = inky
         self.__pinky = pinky
         self.__clyde = clyde
+        self.__str_map = str_map
 
     @staticmethod
     def from_str_map(str_map: str) -> Environment:
@@ -132,7 +138,7 @@ class Environment:
             (blinky is None and inky is None and pinky is None and clyde is None):
             raise ValueError("Missing Pakman and/or ghost(s)")
 
-        return Environment(col, row, gums, walls, pakman_position, blinky, inky, pinky, clyde)
+        return Environment(col, row, gums, walls, pakman_position, blinky, inky, pinky, clyde, str_map)
 
     def do(self, action: Action, state: State, position: Position) -> tuple[Position, State, float, bool]:
         next_position = position.apply_action(action)
