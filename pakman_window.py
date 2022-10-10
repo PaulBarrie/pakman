@@ -84,7 +84,7 @@ class PakmanWindow(arcade.Window):
         self.__pinky.draw()
         self.__clyde.draw()
         self.__pacman.draw()
-        arcade.draw_text(f'#{self.__iteration} Score: {self.__agent.score} T°C: {round(self.__agent.temperature * 100, 2)}',
+        arcade.draw_text(f'#{self.__iteration} Score: {self.__agent.score} Lives: {self.__agent.lives} T°C: {round(self.__agent.temperature * 100, 2)}',
                          10, 10,
                          arcade.csscolor.WHITE, 20)
 

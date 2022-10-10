@@ -16,7 +16,7 @@ MAP_CLYDE = 'C'
 MAP_PINKY = 'R'
 MAP_GHOSTS = [MAP_INKY, MAP_BLINKY, MAP_CLYDE, MAP_PINKY]
 
-REWARD_GUM = 1
+REWARD_GUM = 10
 REWARD_DEFAULT = -1
 NB_STATES = 2 ** 4 * 2 ** 4 * 8 * 4
 REWARD_GHOST = -NB_STATES
@@ -155,18 +155,3 @@ class Environment:
             self.__gums.remove(next_position)
 
         return (next_position, next_state, REWARD_DEFAULT, False)
-
-    """
-    def print(self, agent):
-        res = ''
-        for row in range(self.__rows):
-            for col in range(self.__cols):
-                state = (row, col)
-                if state == agent.state:
-                    res += 'A'
-                else:
-                    res += self.__states[(row, col)]
-
-            res += '\n'
-        print(res)
-    """
