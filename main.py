@@ -5,6 +5,7 @@ from pakman_window import PakmanWindow
 from environment.environment import Environment
 import maps
 import arcade
+import matplotlib.pyplot as plt
 
 from pakman_windowless import PakmanWindowless
 
@@ -29,8 +30,10 @@ if __name__ == '__main__':
         arcade.run()
     else:
         pakman = PakmanWindowless(environment, agent)
-        for i in range(1, 100000):
+        for i in range(1, 50000):
             pakman.update()
 
     agent.save(SAVE_FILE)
     print('Qtable saved')
+    plt.plot(agent.history)
+    plt.show()

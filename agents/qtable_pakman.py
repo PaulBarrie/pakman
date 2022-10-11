@@ -26,7 +26,7 @@ class QtablePakman(Pakman):
     def temperature(self) -> float:
         return self.__temperature
 
-    def __init__(self, initial_position: Position, initial_state: State, env: Environment, qtable=None, alpha=1, gamma=0.8, cooling_rate=0.999) -> None:
+    def __init__(self, initial_position: Position, initial_state: State, env: Environment, qtable=None, history=None, alpha=1, gamma=0.8, cooling_rate=0.999) -> None:
         super().__init__(initial_position)
 
         self.__temperature = 0.0
@@ -41,16 +41,8 @@ class QtablePakman(Pakman):
 
         self.__alpha = alpha
         self.__gamma = gamma
-        self.__history = []
+        self.__history = history if history != None else []
         self.__cooling_rate = cooling_rate
-        # self.reset(False)
-
-    def reset(self, store_history=True) -> None:
-        if store_history:
-            self.__history.append(self.__score)
-        self.__state = deepcopy(self.__initial_state)
-        self.__score = 0.0
-        self.__temperature = 0.0
 
     def heat(self) -> None:
         self.__temperature = 1.0
@@ -81,6 +73,7 @@ class QtablePakman(Pakman):
             self._direction = action.to_direction()
         print(self.qtable[self.__state])
         print(f"chosen action is {action}")
+        self.__history.append(self.__score)
         return action, reward 
 
     def __qtable_get_or_create(self, state: State) -> dict[Action, float]:

@@ -16,11 +16,10 @@ MAP_CLYDE = 'C'
 MAP_PINKY = 'R'
 MAP_GHOSTS = [MAP_INKY, MAP_BLINKY, MAP_CLYDE, MAP_PINKY]
 
-REWARD_GUM = 10
 REWARD_DEFAULT = -1
 NB_STATES = 2 ** 4 * 2 ** 4 * 8 * 4
-REWARD_GHOST = -NB_STATES
-REWARD_WALL = 2 * REWARD_GHOST
+REWARD_GHOST = -2 * NB_STATES
+REWARD_WALL = REWARD_GHOST / 2
 
 
 class Environment:
@@ -93,6 +92,7 @@ class Environment:
         self.__width = width
         self.__height = height
         self.__gums = gums
+        self.__total_gums = len(gums)
         self.__walls = walls
         self.__initial_pakman_position = pakman_position
         self.__blinky = blinky
@@ -153,5 +153,9 @@ class Environment:
 
         if next_position in self.__gums:
             self.__gums.remove(next_position)
+            return (next_position, next_state, self.gum_reward(), False)
 
         return (next_position, next_state, REWARD_DEFAULT, False)
+
+    def gum_reward(self):
+        return self.__total_gums - len(self.__gums)
