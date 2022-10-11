@@ -101,17 +101,17 @@ class LongRangeRadar:
 
     @staticmethod
     def compute_radar(pakman_position: Position, targets: list[Position]) -> LongRangeRadar:
-        closest_ghost_position = list(sorted(
+        closest_target_position = list(sorted(
             targets,
             key = lambda gp: gp.get_distance(pakman_position)
         ))[0]
-        dist = closest_ghost_position.get_distance(pakman_position)
+        dist = closest_target_position.get_distance(pakman_position)
 
         return LongRangeRadar(
-            closest_ghost_position.row < pakman_position.row,
-            closest_ghost_position.row > pakman_position.row,
-            closest_ghost_position.column < pakman_position.column,
-            closest_ghost_position.column > pakman_position.column,
+            closest_target_position.row < pakman_position.row,
+            closest_target_position.row > pakman_position.row,
+            closest_target_position.column < pakman_position.column,
+            closest_target_position.column > pakman_position.column,
             Distance.int_to_distance(dist)
         )
 
