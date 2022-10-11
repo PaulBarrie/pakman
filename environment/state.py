@@ -52,7 +52,7 @@ class ShortRangeRadar:
         return hash((self.__north, self.__south, self.__west, self.__east))
 
 
-class GhostRadar:
+class LongRangeRadar:
     """
         Directions
             NE  | NO
@@ -89,7 +89,7 @@ class GhostRadar:
         self.__distance = distance
 
     def __eq__(self, __o: object) -> bool:
-        return isinstance(__o, GhostRadar) \
+        return isinstance(__o, LongRangeRadar) \
             and self.__north == __o.north \
             and self.__south == __o.south \
             and self.__west == __o.west \
@@ -100,14 +100,14 @@ class GhostRadar:
         return hash((self.__north, self.__south, self.__west, self.__east, self.__distance))
 
     @staticmethod
-    def compute_radar(pakman_position: Position, ghost_positions: list[Position]) -> GhostRadar:
+    def compute_radar(pakman_position: Position, targets: list[Position]) -> LongRangeRadar:
         closest_ghost_position = list(sorted(
-            ghost_positions,
+            targets,
             key = lambda gp: gp.get_distance(pakman_position)
         ))[0]
         dist = closest_ghost_position.get_distance(pakman_position)
 
-        return GhostRadar(
+        return LongRangeRadar(
             closest_ghost_position.row < pakman_position.row,
             closest_ghost_position.row > pakman_position.row,
             closest_ghost_position.column < pakman_position.column,
@@ -120,7 +120,7 @@ class State:
     STATE_VAL_SEPARATOR = ""
 
     @property
-    def ghost_radar(self) -> GhostRadar:
+    def ghost_radar(self) -> LongRangeRadar:
         return self.__ghost_radar
 
     @property
@@ -133,7 +133,7 @@ class State:
 
     def __init__(
         self, 
-        ghost_radar: GhostRadar, 
+        ghost_radar: LongRangeRadar, 
         gum_radar: ShortRangeRadar, 
         wall_radar: ShortRangeRadar
     ) -> None:
@@ -150,7 +150,7 @@ class State:
     ) -> State:
 
         return State(
-            GhostRadar.compute_radar(pakman_position, ghost_positions),
+            LongRangeRadar.compute_radar(pakman_position, ghost_positions),
             ShortRangeRadar.compute_radar(pakman_position, gum_positions),
             ShortRangeRadar.compute_radar(pakman_position, wall_positions)
         )
@@ -174,6 +174,3 @@ class State:
         wall_state = self.__state_str(self.__wall_radar)
 
         return f'ghost: {ghost_state}, gums: {gum_state}, walls: {wall_state}'
-
-    # def __state_str(self, state: dict) -> str:
-    #     return State.STATE_VAL_SEPARATOR.join([key for key, val in state.items() if val == 1])

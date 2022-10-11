@@ -17,9 +17,12 @@ MAP_PINKY = 'R'
 MAP_GHOSTS = [MAP_INKY, MAP_BLINKY, MAP_CLYDE, MAP_PINKY]
 
 REWARD_DEFAULT = -1
-NB_STATES = 2 ** 4 * 2 ** 4 * 8 * 4
-REWARD_GHOST = -2 * NB_STATES
-REWARD_WALL = REWARD_GHOST / 2
+LONG_RANGE_RADAR_STATES = 2 ** 4 * 4
+SHORT_RANGE_RADAR_STATES = 2 ** 4
+POSITION_STATES = 21 * 28
+NB_STATES = (LONG_RANGE_RADAR_STATES * SHORT_RANGE_RADAR_STATES * SHORT_RANGE_RADAR_STATES * POSITION_STATES)
+REWARD_GHOST = -NB_STATES
+REWARD_WALL = REWARD_GHOST / 10
 
 
 class Environment:
@@ -158,4 +161,6 @@ class Environment:
         return (next_position, next_state, REWARD_DEFAULT, False)
 
     def gum_reward(self):
+        remaining_gums = len(self.gums)
+        if remaining_gums == 0 : return NB_STATES
         return self.__total_gums - len(self.__gums)
