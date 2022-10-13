@@ -1,55 +1,58 @@
-import numpy as np
+from __future__ import annotations
+from core_game.position import Position
+from core_game.actions import Action
 from environment.metrics import *
 
 
-class State:
-    STATE_VAL_SEPARATOR = ""
-
-    def __init__(self):
-        self.__ghost_radar = None
-        self.__gum_radar = None
-        self.__wall_radar = None
-
-    def update(self, ghosts: list[(int,int)], pacman: tuple[int, int], gums: list[(int, int)], walls: list[(int, int)]):
-        self.__ghost_radar = GhostRadar().get(ghosts, pacman)
-        self.__gum_radar = ShortRangeRadar.get(pacman, gums)
-        self.__wall_radar = ShortRangeRadar.get(pacman, walls)
-
-    def __repr__(self) -> str:
-        ghost_state = self.__state_str(self.__ghost_radar)
-        gum_state = self.__state_str(self.__gum_radar)
-        wall_state = self.__state_str(self.__wall_radar)
-
-        return f'ghost: {ghost_state}, gums: {gum_state}, walls: {wall_state}'
-
-    def __state_str(self, state: dict) -> str:
-        return State.STATE_VAL_SEPARATOR.join([key for key, val in state.items() if val == 1])
-
-
 class ShortRangeRadar:
+    @property
+    def north(self) -> bool:
+        return self.__north
+
+    @property
+    def south(self) -> bool:
+        return self.__south
+
+    @property
+    def west(self) -> bool:
+        return self.__west
+
+    @property
+    def east(self) -> bool:
+        return self.__east
+
+    def __init__(self, north: bool, south: bool, west: bool, east: bool) -> None:
+        self.__north = north
+        self.__south = south
+        self.__west = west
+        self.__east = east
+
     @staticmethod
-    def get(position, targets) -> dict:
-        pos_X, pos_Y = position
-        radar = {
-            ActionMoves.N: 0,
-            ActionMoves.S: 0,
-            ActionMoves.E: 0,
-            ActionMoves.O: 0
-        }
+    def compute_radar(position: Position, targets: list[Position]) -> ShortRangeRadar:
+        north_position = position.apply_action(Action.UP)
+        south_position = position.apply_action(Action.DOWN)
+        west_position = position.apply_action(Action.LEFT)
+        east_position = position.apply_action(Action.RIGHT)
 
-        for targetX, targetY in targets:
-            if targetX == pos_X - 1 and targetY == pos_Y:
-                radar[ActionMoves.N] = 1
-            elif targetX == pos_X + 1 and targetY == pos_Y:
-                radar[ActionMoves.S] = 1
-            elif targetX == pos_X and targetY == pos_Y + 1:
-                radar[ActionMoves.E] = 1
-            elif targetX == pos_X and targetY == pos_Y - 1:
-                radar[ActionMoves.O] = 1
-        return radar
+        return ShortRangeRadar(
+            north_position in targets,
+            south_position in targets,
+            west_position in targets,
+            east_position in targets
+        )
+
+    def __eq__(self, __o: object) -> bool:
+        return isinstance(__o, ShortRangeRadar) \
+            and self.__north == __o.north \
+            and self.__south == __o.south \
+            and self.__west == __o.west \
+            and self.__east == __o.east
+
+    def __hash__(self) -> int:
+        return hash((self.__north, self.__south, self.__west, self.__east))
 
 
-class GhostRadar:
+class LongRangeRadar:
     """
         Directions
             NE  | NO
@@ -58,30 +61,116 @@ class GhostRadar:
             SE  | SO
                 |
     """
+    @property
+    def north(self) -> bool:
+        return self.__north
+    
+    @property
+    def south(self) -> bool:
+        return self.__south
+
+    @property
+    def west(self) -> bool:
+        return self.__west
+
+    @property
+    def east(self) -> bool:
+        return self.__east
+
+    @property
+    def distance(self) -> Distance:
+        return self.__distance
+
+    def __init__(self, north, south, west, east, distance: Distance) -> None:
+        self.__north = north
+        self.__south = south
+        self.__west = west
+        self.__east = east
+        self.__distance = distance
+
+    def __eq__(self, __o: object) -> bool:
+        return isinstance(__o, LongRangeRadar) \
+            and self.__north == __o.north \
+            and self.__south == __o.south \
+            and self.__west == __o.west \
+            and self.__east == __o.east \
+            and self.__distance == __o.distance
+
+    def __hash__(self) -> int:
+        return hash((self.__north, self.__south, self.__west, self.__east, self.__distance))
 
     @staticmethod
-    def get(ghost_positions, pacman) -> dict:
-        pacman_X, pacman_Y = pacman
-        ghost_dist = [abs(pacman_X - x) + abs(pacman_Y - y) for x, y in ghost_positions]
-        distance = min(ghost_dist)
-        closest_X, closest_Y = ghost_positions[np.argmin(ghost_dist)]
-        direction = {
-            ActionMoves.N: 0,
-            ActionMoves.S: 0,
-            ActionMoves.E: 0,
-            ActionMoves.O: 0,
-        }
+    def compute_radar(pakman_position: Position, targets: list[Position]) -> LongRangeRadar:
+        closest_target_position = list(sorted(
+            targets,
+            key = lambda gp: gp.get_distance(pakman_position)
+        ))[0]
+        dist = closest_target_position.get_distance(pakman_position)
 
-        if closest_X < pacman_X:
-            direction[ActionMoves.N] = 1
-        else:
-            direction[ActionMoves.S] = 1
-        if closest_Y < pacman_Y:
-            direction[ActionMoves.O] = 1
-        else:
-            direction[ActionMoves.E] = 1
+        return LongRangeRadar(
+            closest_target_position.row < pakman_position.row,
+            closest_target_position.row > pakman_position.row,
+            closest_target_position.column < pakman_position.column,
+            closest_target_position.column > pakman_position.column,
+            Distance.int_to_distance(dist)
+        )
 
-        return {
-            "direction": direction,
-            "distance": distance
-        }
+
+class State:
+    STATE_VAL_SEPARATOR = ""
+
+    @property
+    def ghost_radar(self) -> LongRangeRadar:
+        return self.__ghost_radar
+
+    @property
+    def gum_radar(self) -> ShortRangeRadar:
+        return self.__gum_radar
+    
+    @property
+    def wall_radar(self) -> ShortRangeRadar:
+        return self.__wall_radar
+
+    def __init__(
+        self, 
+        ghost_radar: LongRangeRadar, 
+        gum_radar: ShortRangeRadar, 
+        wall_radar: ShortRangeRadar
+    ) -> None:
+        self.__ghost_radar = ghost_radar
+        self.__gum_radar = gum_radar
+        self.__wall_radar = wall_radar
+
+    @staticmethod
+    def compute_state(
+        ghost_positions: list[Position], 
+        pakman_position: Position, 
+        gum_positions: list[Position], 
+        wall_positions: list[Position]
+    ) -> State:
+
+        return State(
+            LongRangeRadar.compute_radar(pakman_position, ghost_positions),
+            ShortRangeRadar.compute_radar(pakman_position, gum_positions),
+            ShortRangeRadar.compute_radar(pakman_position, wall_positions)
+        )
+
+    def __eq__(self, __o: object) -> bool:
+        return isinstance(__o, State) \
+            and self.__ghost_radar == __o.ghost_radar \
+            and self.__gum_radar == __o.gum_radar \
+            and self.__wall_radar == __o.wall_radar
+
+    def __hash__(self) -> int:
+        return hash(( 
+            hash(self.__gum_radar), 
+            hash(self.__wall_radar), 
+            hash(self.__ghost_radar) 
+        ))
+
+    def __repr__(self) -> str:
+        ghost_state = self.__state_str(self.__ghost_radar)
+        gum_state = self.__state_str(self.__gum_radar)
+        wall_state = self.__state_str(self.__wall_radar)
+
+        return f'ghost: {ghost_state}, gums: {gum_state}, walls: {wall_state}'
