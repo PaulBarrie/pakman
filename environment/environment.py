@@ -149,6 +149,7 @@ class Environment:
 
         if next_position in self.ghost_positions:
             reset_state = State.compute_state(self.ghost_positions, position, self.__gums, self.__walls)
+            print("The Pakman stumbled upon an imperialist !")
             return (self.__initial_pakman_position, reset_state, REWARD_GHOST, True)
 
         if next_position in self.__walls:
