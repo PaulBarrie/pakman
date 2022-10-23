@@ -17,7 +17,7 @@ class Pakman:
     def direction(self) -> Direction:
         return self._direction
 
-    def __init__(self, initial_position: Position, initial_direction = Direction.WEST, lives: int = 3) -> None:
+    def __init__(self, initial_position: Position, initial_direction=Direction.WEST, lives: int = 3) -> None:
         self._position = initial_position
         self._direction = initial_direction
         self.__lives = lives

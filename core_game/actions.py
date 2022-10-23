@@ -2,6 +2,7 @@ from __future__ import annotations
 from enum import Enum
 from core_game.directions import Direction
 
+
 class Action(tuple[int, int], Enum):
     UP = (-1, 0)
     DOWN = (1, 0)
@@ -27,10 +28,10 @@ class Action(tuple[int, int], Enum):
             return Action.LEFT
         if direction == Direction.EAST:
             return Action.RIGHT
-        
-        raise ValueError("Invalid direction")
 
+        raise ValueError("Invalid direction")
 
     @staticmethod
     def as_list() -> list[Action]:
         return [Action.UP, Action.DOWN, Action.LEFT, Action.RIGHT]
+

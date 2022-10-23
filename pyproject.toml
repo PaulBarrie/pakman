@@ -5,10 +5,17 @@ description = ""
 authors = ["paulb <barrie.paul@protonmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "3.10"
 arcade = "^2.6.16"
 numpy = "^1.23.3"
 argmin = "^0.0.0"
+keras = "^2.10.0"
+matplotlib = "^3.6.1"
+adam = "^0.0.0-alpha.0"
+tensorflow = "^2.10.0"
+sklearn = "^0.0"
+tf = "^1.0.0"
+tqdm = "^4.64.1"
 
 [tool.poetry.dev-dependencies]
 

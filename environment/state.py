@@ -1,4 +1,10 @@
 from __future__ import annotations
+
+from typing import Union
+
+import numpy
+import numpy as np
+
 from core_game.position import Position
 from core_game.actions import Action
 from environment.metrics import *
@@ -43,10 +49,10 @@ class ShortRangeRadar:
 
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, ShortRangeRadar) \
-            and self.__north == __o.north \
-            and self.__south == __o.south \
-            and self.__west == __o.west \
-            and self.__east == __o.east
+               and self.__north == __o.north \
+               and self.__south == __o.south \
+               and self.__west == __o.west \
+               and self.__east == __o.east
 
     def __hash__(self) -> int:
         return hash((self.__north, self.__south, self.__west, self.__east))
@@ -61,10 +67,11 @@ class LongRangeRadar:
             SE  | SO
                 |
     """
+
     @property
     def north(self) -> bool:
         return self.__north
-    
+
     @property
     def south(self) -> bool:
         return self.__south
@@ -90,11 +97,11 @@ class LongRangeRadar:
 
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, LongRangeRadar) \
-            and self.__north == __o.north \
-            and self.__south == __o.south \
-            and self.__west == __o.west \
-            and self.__east == __o.east \
-            and self.__distance == __o.distance
+               and self.__north == __o.north \
+               and self.__south == __o.south \
+               and self.__west == __o.west \
+               and self.__east == __o.east \
+               and self.__distance == __o.distance
 
     def __hash__(self) -> int:
         return hash((self.__north, self.__south, self.__west, self.__east, self.__distance))
@@ -103,7 +110,7 @@ class LongRangeRadar:
     def compute_radar(pakman_position: Position, targets: list[Position]) -> LongRangeRadar:
         closest_target_position = list(sorted(
             targets,
-            key = lambda gp: gp.get_distance(pakman_position)
+            key=lambda gp: gp.get_distance(pakman_position)
         ))[0]
         dist = closest_target_position.get_distance(pakman_position)
 
@@ -126,16 +133,16 @@ class State:
     @property
     def gum_radar(self) -> ShortRangeRadar:
         return self.__gum_radar
-    
+
     @property
     def wall_radar(self) -> ShortRangeRadar:
         return self.__wall_radar
 
     def __init__(
-        self, 
-        ghost_radar: LongRangeRadar, 
-        gum_radar: ShortRangeRadar, 
-        wall_radar: ShortRangeRadar
+            self,
+            ghost_radar: LongRangeRadar,
+            gum_radar: ShortRangeRadar,
+            wall_radar: ShortRangeRadar,
     ) -> None:
         self.__ghost_radar = ghost_radar
         self.__gum_radar = gum_radar
@@ -143,12 +150,11 @@ class State:
 
     @staticmethod
     def compute_state(
-        ghost_positions: list[Position], 
-        pakman_position: Position, 
-        gum_positions: list[Position], 
-        wall_positions: list[Position]
+            ghost_positions: list[Position],
+            pakman_position: Position,
+            gum_positions: list[Position],
+            wall_positions: list[Position],
     ) -> State:
-
         return State(
             LongRangeRadar.compute_radar(pakman_position, ghost_positions),
             ShortRangeRadar.compute_radar(pakman_position, gum_positions),
@@ -157,15 +163,15 @@ class State:
 
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, State) \
-            and self.__ghost_radar == __o.ghost_radar \
-            and self.__gum_radar == __o.gum_radar \
-            and self.__wall_radar == __o.wall_radar
+               and self.__ghost_radar == __o.ghost_radar \
+               and self.__gum_radar == __o.gum_radar \
+               and self.__wall_radar == __o.wall_radar
 
     def __hash__(self) -> int:
-        return hash(( 
-            hash(self.__gum_radar), 
-            hash(self.__wall_radar), 
-            hash(self.__ghost_radar) 
+        return hash((
+            hash(self.__gum_radar),
+            hash(self.__wall_radar),
+            hash(self.__ghost_radar)
         ))
 
     def __repr__(self) -> str:
@@ -174,3 +180,24 @@ class State:
         wall_state = self.__state_str(self.__wall_radar)
 
         return f'ghost: {ghost_state}, gums: {gum_state}, walls: {wall_state}'
+
+    def __state_str(self, radar: Union[ShortRangeRadar, LongRangeRadar]) -> str:
+        return radar.__repr__()
+
+
+class DQLearnState:
+    def __init__(self, state_array: numpy.array) -> None:
+        self.__state_array = state_array
+
+    @property
+    def state(self) -> np.array:
+        return self.__state_array
+
+    def __eq__(self, __o: object) -> bool:
+        return isinstance(__o, DQLearnState) and self.__state_array == __o.__state_array
+
+    def __hash__(self) -> int:
+        return hash((hash(self.__state_array)))
+
+    def __repr__(self) -> str:
+        return f'{self.__state_array.__hash__()}'
