@@ -4,6 +4,7 @@ from __future__ import annotations
 from core_game.actions import Action
 from core_game.directions import Direction
 
+
 class Position:
     @property
     def row(self) -> int:
@@ -19,8 +20,8 @@ class Position:
 
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, Position) \
-            and self.__row == __o.row \
-            and self.__column == __o.column
+               and self.__row == __o.row \
+               and self.__column == __o.column
 
     def get_distance(self, other: Position) -> int:
         return abs(self.__row - other.row) + abs(self.__column - other.column)

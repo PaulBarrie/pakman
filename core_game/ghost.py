@@ -39,6 +39,7 @@ class Ghost:
             pakman.die()
 
         return (optimum_action, -1.0)
+    
 
     def _best_action(self, walls: list[Position], pakman: Pakman) -> Action:
         legal_actions = list(filter(
