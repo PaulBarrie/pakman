@@ -1,11 +1,8 @@
 import arcade
-from agents.qtable_pakman import QtablePakman
-from core_game.ghost import Ghost
-from core_game.pakman import Pakman
 
+from core_game.pakman import Pakman
 from core_game.position import Position
 from environment.environment import Environment
-from environment.state import State
 from pakman_game import PakmanGame
 
 SPRITE_SCALE = 0.25
