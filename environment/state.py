@@ -101,10 +101,7 @@ class LongRangeRadar:
 
     @staticmethod
     def compute_radar(pakman_position: Position, targets: list[Position]) -> LongRangeRadar:
-        closest_target_position = list(sorted(
-            targets,
-            key = lambda gp: gp.get_distance(pakman_position)
-        ))[0]
+        closest_target_position = LongRangeRadar.sort_by_distance(pakman_position, targets)[0]
         dist = closest_target_position.get_distance(pakman_position)
 
         return LongRangeRadar(
@@ -115,13 +112,25 @@ class LongRangeRadar:
             Distance.int_to_distance(dist)
         )
 
+    @staticmethod
+    def sort_by_distance(pakman_position: Position, targets: list[Position]):
+        return list(sorted(
+            targets,
+            key = lambda gp: gp.get_distance(pakman_position)
+        ))
+
+
 
 class State:
     STATE_VAL_SEPARATOR = ""
 
     @property
-    def ghost_radar(self) -> LongRangeRadar:
-        return self.__ghost_radar
+    def closest_ghost_radar(self) -> LongRangeRadar:
+        return self.__closest_ghost_radar
+
+    @property
+    def second_closest_ghost_radar(self) -> LongRangeRadar:
+        return self.__second_closest_ghost_radar
 
     @property
     def gum_radar(self) -> ShortRangeRadar:
@@ -133,11 +142,13 @@ class State:
 
     def __init__(
         self, 
-        ghost_radar: LongRangeRadar, 
+        closest_ghost_radar: LongRangeRadar,
+        second_closest_ghost_radar: LongRangeRadar,
         gum_radar: ShortRangeRadar, 
         wall_radar: ShortRangeRadar
     ) -> None:
-        self.__ghost_radar = ghost_radar
+        self.__closest_ghost_radar = closest_ghost_radar
+        self.__second_closest_ghost_radar = second_closest_ghost_radar
         self.__gum_radar = gum_radar
         self.__wall_radar = wall_radar
 
@@ -151,13 +162,15 @@ class State:
 
         return State(
             LongRangeRadar.compute_radar(pakman_position, ghost_positions),
+            LongRangeRadar.compute_radar(pakman_position, LongRangeRadar.sort_by_distance(pakman_position, ghost_positions[1:])),
             ShortRangeRadar.compute_radar(pakman_position, gum_positions),
             ShortRangeRadar.compute_radar(pakman_position, wall_positions)
         )
 
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, State) \
-            and self.__ghost_radar == __o.ghost_radar \
+            and self.__closest_ghost_radar == __o.closest_ghost_radar \
+            and self.__second_closest_ghost_radar == __o.second_closest_ghost_radar \
             and self.__gum_radar == __o.gum_radar \
             and self.__wall_radar == __o.wall_radar
 
@@ -165,12 +178,14 @@ class State:
         return hash(( 
             hash(self.__gum_radar), 
             hash(self.__wall_radar), 
-            hash(self.__ghost_radar) 
+            hash(self.__closest_ghost_radar),
+            hash(self.__second_closest_ghost_radar)
         ))
 
     def __repr__(self) -> str:
-        ghost_state = self.__state_str(self.__ghost_radar)
+        closest_ghost_state = self.__state_str(self.__closest_ghost_radar)
+        second_closest_ghost_state = self.__state_str(self.__second_closest_ghost_radar)
         gum_state = self.__state_str(self.__gum_radar)
         wall_state = self.__state_str(self.__wall_radar)
 
-        return f'ghost: {ghost_state}, gums: {gum_state}, walls: {wall_state}'
+        return f'closest ghost: {closest_ghost_state}, second closest ghost: {second_closest_ghost_state}, gums: {gum_state}, walls: {wall_state}'
