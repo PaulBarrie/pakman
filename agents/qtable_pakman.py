@@ -73,8 +73,10 @@ class QtablePakman(Pakman):
             self._direction = action.to_direction()
         print(self.qtable[self.__state])
         print(f"chosen action is {action}")
-        self.__history.append(self.__score)
         return action, reward 
+
+    def save_history(self):
+        self.__history.append(self.__score)
 
     def __qtable_get_or_create(self, state: State) -> dict[Action, float]:
         return self.qtable.setdefault(

@@ -66,4 +66,5 @@ class PakmanGame:
             self.__environment.gums,
             self.__environment.walls
         )
+        self.__agent.save_history()
         self.__agent = QtablePakman(self.__environment.initial_pakman_position, initial_state, self.__environment, self.__agent.qtable, self.__agent.history)
