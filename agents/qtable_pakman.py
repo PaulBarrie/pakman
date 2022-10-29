@@ -78,6 +78,15 @@ class QtablePakman(Pakman):
     def save_history(self):
         self.__history.append(self.__score)
 
+    def refreshState(
+      self,
+      ghost_positions: list[Position],
+      gum_positions: list[Position], 
+      wall_positions: list[Position]
+    ) -> None:
+      self.__state = State.compute_state(ghost_positions, self._position, gum_positions, wall_positions)
+
+
     def __qtable_get_or_create(self, state: State) -> dict[Action, float]:
         return self.qtable.setdefault(
             state,

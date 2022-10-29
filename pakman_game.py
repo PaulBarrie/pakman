@@ -47,6 +47,13 @@ class PakmanGame:
 
         else: 
             if self.__agent.lives > 0 and len(self.__environment.gums) > 0:
+                current_ghost_positions = [self.__environment.blinky.position, self.__environment.inky.position, self.__environment.pinky.position, self.__environment.clyde.position]
+                self.__agent.refreshState(
+                    current_ghost_positions, 
+                    self.__environment.gums, 
+                    self.__environment.walls
+                )
+                print(self.__agent.state)
                 self.__agent.step()
             else:
                 self.reset()

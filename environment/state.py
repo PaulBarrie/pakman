@@ -51,6 +51,9 @@ class ShortRangeRadar:
     def __hash__(self) -> int:
         return hash((self.__north, self.__south, self.__west, self.__east))
 
+    def __repr__(self) -> str:
+        return f"N: {self.__north}, W: {self.__west}, E: {self.__east}, S: {self.__south}"
+
 
 class LongRangeRadar:
     """
@@ -99,9 +102,12 @@ class LongRangeRadar:
     def __hash__(self) -> int:
         return hash((self.__north, self.__south, self.__west, self.__east, self.__distance))
 
+    def __repr__(self) -> str:
+        return f"N: {self.__north}, W: {self.__west}, E: {self.__east}, S: {self.__south}, distance: {self.__distance}"
+
     @staticmethod
-    def compute_radar(pakman_position: Position, targets: list[Position]) -> LongRangeRadar:
-        closest_target_position = LongRangeRadar.sort_by_distance(pakman_position, targets)[0]
+    def compute_radar(pakman_position: Position, sorted_targets: list[Position], index: int) -> LongRangeRadar:
+        closest_target_position = sorted_targets[index]
         dist = closest_target_position.get_distance(pakman_position)
 
         return LongRangeRadar(
@@ -112,12 +118,12 @@ class LongRangeRadar:
             Distance.int_to_distance(dist)
         )
 
-    @staticmethod
-    def sort_by_distance(pakman_position: Position, targets: list[Position]):
-        return list(sorted(
-            targets,
-            key = lambda gp: gp.get_distance(pakman_position)
-        ))
+    # @staticmethod
+    # def sort_by_distance(pakman_position: Position, targets: list[Position]):
+    #     return list(sorted(
+    #         targets,
+    #         key = lambda gp: gp.get_distance(pakman_position)
+    #     ))
 
 
 
@@ -133,7 +139,7 @@ class State:
         return self.__second_closest_ghost_radar
 
     @property
-    def gum_radar(self) -> ShortRangeRadar:
+    def gum_radar(self) -> LongRangeRadar:
         return self.__gum_radar
     
     @property
@@ -144,7 +150,7 @@ class State:
         self, 
         closest_ghost_radar: LongRangeRadar,
         second_closest_ghost_radar: LongRangeRadar,
-        gum_radar: ShortRangeRadar, 
+        gum_radar: LongRangeRadar, 
         wall_radar: ShortRangeRadar
     ) -> None:
         self.__closest_ghost_radar = closest_ghost_radar
@@ -159,11 +165,20 @@ class State:
         gum_positions: list[Position], 
         wall_positions: list[Position]
     ) -> State:
+        sorted_ghosts_by_distance = list(sorted(
+            ghost_positions,
+            key = lambda gp: gp.get_distance(pakman_position)
+        ))
+
+        sorted_gums_by_distance = list(sorted(
+            gum_positions,
+            key = lambda gp: gp.get_distance(pakman_position)
+        ))
 
         return State(
-            LongRangeRadar.compute_radar(pakman_position, ghost_positions),
-            LongRangeRadar.compute_radar(pakman_position, LongRangeRadar.sort_by_distance(pakman_position, ghost_positions[1:])),
-            ShortRangeRadar.compute_radar(pakman_position, gum_positions),
+            LongRangeRadar.compute_radar(pakman_position, sorted_ghosts_by_distance, 0),
+            LongRangeRadar.compute_radar(pakman_position, sorted_ghosts_by_distance, 1),
+            LongRangeRadar.compute_radar(pakman_position, sorted_gums_by_distance, 0),
             ShortRangeRadar.compute_radar(pakman_position, wall_positions)
         )
 
@@ -183,9 +198,9 @@ class State:
         ))
 
     def __repr__(self) -> str:
-        closest_ghost_state = self.__state_str(self.__closest_ghost_radar)
-        second_closest_ghost_state = self.__state_str(self.__second_closest_ghost_radar)
-        gum_state = self.__state_str(self.__gum_radar)
-        wall_state = self.__state_str(self.__wall_radar)
+        # closest_ghost_state = self.__state_str(self.__closest_ghost_radar)
+        # second_closest_ghost_state = self.__state_str(self.__second_closest_ghost_radar)
+        # gum_state = self.__state_str(self.__gum_radar)
+        # wall_state = self.__state_str(self.__wall_radar)
 
-        return f'closest ghost: {closest_ghost_state}, second closest ghost: {second_closest_ghost_state}, gums: {gum_state}, walls: {wall_state}'
+        return f'closest ghost: {self.__closest_ghost_radar}, second closest ghost: {self.__second_closest_ghost_radar}, gums: {self.__gum_radar}, walls: {self.__wall_radar}'

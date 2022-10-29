@@ -30,7 +30,7 @@ if __name__ == '__main__':
         arcade.run()
     else:
         pakman = PakmanWindowless(environment, agent)
-        for i in range(1, 50000):
+        for i in range(1, 100000):
             pakman.update()
 
     agent.save(SAVE_FILE)

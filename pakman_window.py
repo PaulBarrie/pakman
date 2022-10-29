@@ -82,7 +82,7 @@ class PakmanWindow(arcade.Window):
                          10, 10,
                          arcade.csscolor.WHITE, 20)
 
-    def on_update(self, delta_time):          
+    def on_update(self, delta_time):       
         self.__game.update()
         self.__blinky.center_x, self.__blinky.center_y = self.position_to_xy(self.__game.environment.blinky.position)
         self.__inky.center_x, self.__inky.center_y = self.position_to_xy(self.__game.environment.inky.position)
