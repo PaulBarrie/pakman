@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from pakman_windowless import PakmanWindowless
 
 SAVE_FILE = 'qtable.dat'
-GRAPHICAL_INTERFACE = True
+GRAPHICAL_INTERFACE = False
 
 if __name__ == '__main__':
     environment = Environment.from_str_map(maps.GAME2)

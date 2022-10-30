@@ -16,11 +16,13 @@ MAP_CLYDE = 'C'
 MAP_PINKY = 'R'
 MAP_GHOSTS = [MAP_INKY, MAP_BLINKY, MAP_CLYDE, MAP_PINKY]
 
-REWARD_DEFAULT = -1
-LONG_RANGE_RADAR_STATES = 2 ** 4 * 4
+GUM_REWARD = 100
+REWARD_DEFAULT = -GUM_REWARD / 5
+LONG_RANGE_RADAR_STATES = 2 ** 4 * 3
 SHORT_RANGE_RADAR_STATES = 2 ** 4
-POSITION_STATES = 21 * 28
-NB_STATES = (LONG_RANGE_RADAR_STATES * SHORT_RANGE_RADAR_STATES * SHORT_RANGE_RADAR_STATES * POSITION_STATES)
+AREA_RADAR_STATES = 2 ** 8
+# POSITION_STATES = 21 * 28
+NB_STATES = LONG_RANGE_RADAR_STATES * SHORT_RANGE_RADAR_STATES * SHORT_RANGE_RADAR_STATES
 REWARD_GHOST = -NB_STATES
 REWARD_WALL = REWARD_GHOST / 10
 
@@ -95,7 +97,7 @@ class Environment:
         self.__width = width
         self.__height = height
         self.__gums = gums
-        self.__total_gums = len(gums)
+        self.__gum_reward = len(gums)
         self.__walls = walls
         self.__initial_pakman_position = pakman_position
         self.__blinky = blinky
@@ -157,11 +159,13 @@ class Environment:
 
         if next_position in self.__gums:
             self.__gums.remove(next_position)
-            return (next_position, next_state, self.gum_reward(), False)
+            # return (next_position, next_state, self.gum_reward(), False)
+            return (next_position, next_state, GUM_REWARD, False)
 
         return (next_position, next_state, REWARD_DEFAULT, False)
 
-    def gum_reward(self):
-        remaining_gums = len(self.gums)
-        if remaining_gums == 0 : return NB_STATES
-        return self.__total_gums - len(self.__gums)
+    # def gum_reward(self):
+    #     # remaining_gums = len(self.gums)
+    #     # if remaining_gums == 0 : return NB_STATES
+    #     # return self.__total_gums - len(self.__gums)
+    #     return len(self.)

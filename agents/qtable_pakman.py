@@ -26,13 +26,12 @@ class QtablePakman(Pakman):
     def temperature(self) -> float:
         return self.__temperature
 
-    def __init__(self, initial_position: Position, initial_state: State, env: Environment, qtable=None, history=None, alpha=1, gamma=0.8, cooling_rate=0.999) -> None:
+    def __init__(self, initial_position: Position, initial_state: State, env: Environment, qtable=None, history=None, alpha=0.7, gamma=0.8, cooling_rate=0.999) -> None:
         super().__init__(initial_position)
 
         self.__temperature = 0.0
         self.__score = 0.0
         self.__env = env
-        self.__initial_state = initial_state
         self.__state = deepcopy(initial_state)
         self.qtable: dict[
             State, 
