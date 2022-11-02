@@ -1,6 +1,7 @@
 from __future__ import annotations
 from enum import Enum
 
+
 class Distance(str, Enum):
     ONE = "1"
     TWO = "2"

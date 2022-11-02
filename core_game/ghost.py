@@ -16,13 +16,17 @@ class Ghost:
     def is_scared(self) -> bool:
         return self.__is_scared
 
+    @property
+    def direction(self) -> Direction:
+        return self.__direction
+
     def __init__(
-        self, 
-        initial_position: Position,
-        chase_behaviour: ChaseBehaviour,
-        scared_behaviour: ScaredBehaviour,
-        initial_direction = Direction.WEST,
-        is_scared: bool = False
+            self,
+            initial_position: Position,
+            chase_behaviour: ChaseBehaviour,
+            scared_behaviour: ScaredBehaviour,
+            initial_direction=Direction.WEST,
+            is_scared: bool = False
     ):
         self.__position = initial_position
         self.__chase_behaviour = chase_behaviour
@@ -43,7 +47,7 @@ class Ghost:
     def _best_action(self, walls: list[Position], pakman: Pakman) -> Action:
         legal_actions = list(filter(
             lambda action: not self.__position.apply_action(action) in walls \
-                and not self.__direction.is_reverse(action.to_direction()),
+                           and not self.__direction.is_reverse(action.to_direction()),
             Action.as_list()
         ))
 
