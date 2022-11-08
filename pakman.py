@@ -1,6 +1,5 @@
-from core_game.actions import Action
-from core_game.position import Position
-from core_game.directions import Direction
+from actions import Action, Direction
+from position import Position
 
 
 # should be derived into KeyboardPakman, QTablePakman and NeuronsPakman
