@@ -3,7 +3,7 @@ from position import Position
 
 
 # should be derived into KeyboardPakman, QTablePakman and NeuronsPakman
-class Pakman:
+class Pacman:
     @property
     def position(self) -> Position:
         return self._position

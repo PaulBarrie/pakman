@@ -1,4 +1,6 @@
 from __future__ import annotations
+from actions import Action
+from position import Position
 from tile import Tile
 
 
@@ -15,6 +17,17 @@ class World:
 
   def __getitem__(self, index: int) -> list[Tile]:
     return self.__tiles[index]
+
+  def get_legal_actions(self, position: Position) -> list[Action]:
+    return list(filter(
+      lambda action: not self.__is_wall(position.apply_action(action)),
+      Action.as_list()
+    ))
+
+  def __is_wall(self, position: Position) -> bool:
+    return 0 <= position.row and position.row < len(self.__tiles) \
+      and 0 <= position.column and position.column < len(self.__tiles[0]) \
+      and self.__tiles[position.row][position.column].isWall
 
   @staticmethod
   def parseArray(world: str) -> World:

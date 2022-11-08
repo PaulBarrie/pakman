@@ -1,61 +1,39 @@
-from core_game.chase_behaviour import ChaseBehaviour
-from core_game.directions import Direction
-from core_game.pakman import Pakman
-from core_game.position import Position
-from core_game.scared_behaviour import ScaredBehaviour
-from core_game.actions import Action
+from actions import Action
+from pacman import Pacman
+from position import Position
+from world import World
 
 
-# Inky = Ghost(env, env.ghosts[INKY])
 class Ghost:
-    @property
-    def position(self) -> Position:
-        return self.__position
+  @property
+  def position(self) -> Position:
+    return self._position
 
-    @property
-    def is_scared(self) -> bool:
-        return self.__is_scared
+  @property
+  def isScared(self) -> bool:
+    return self._isScared
 
-    def __init__(
-        self, 
-        initial_position: Position,
-        chase_behaviour: ChaseBehaviour,
-        scared_behaviour: ScaredBehaviour,
-        initial_direction = Direction.WEST,
-        is_scared: bool = False
-    ):
-        self.__position = initial_position
-        self.__chase_behaviour = chase_behaviour
-        self.__scared_behaviour = scared_behaviour
-        self.__direction = initial_direction
-        self.__is_scared = is_scared
+  def __init__(self, position: Position, corner: Position, steps = 0, scaredSteps = 0, isScared=False, isScattering=False, stepsToSwitchMode=200, maxScaredSteps=100) -> None:
+    self._position = position
+    self._corner = corner
+    self._steps = steps
+    self._scaredSteps = scaredSteps
+    self._isScared = isScared
+    self._isScattering = isScattering
+    self._stepsToSwitchMode = stepsToSwitchMode
+    self._maxScaredSteps = maxScaredSteps
 
-    def step(self, walls: list[Position], pakman: Pakman) -> tuple[Action, float]:
-        optimum_action = self._best_action(walls, pakman)
-        self.__position = self.__position.apply_action(optimum_action)
-        self.__direction = optimum_action.to_direction()
+  # specific ghost subclasss must oerride this method to add movement logic !
+  def move(self, world: World, pacman: Pacman) -> None:
+    # call this logic before calling overridden behaviour in subclasses !
+    if self.__isScared and self.__scaredSteps == self.__maxScaredSteps:
+      self.__isScared = False
+      self.__scaredSteps = 0
 
-        if self.__position == pakman.position:
-            pakman.die()
+    if self.__steps == self.__stepsToSwitchMode:
+      self.__isScattering = not self.__isScattering
+      self.__steps = 0
 
-        return (optimum_action, -1.0)
-
-    def _best_action(self, walls: list[Position], pakman: Pakman) -> Action:
-        legal_actions = list(filter(
-            lambda action: not self.__position.apply_action(action) in walls \
-                and not self.__direction.is_reverse(action.to_direction()),
-            Action.as_list()
-        ))
-
-        if (self.__is_scared):
-            return self.__scared_behaviour.calculate_best_move(
-                pakman,
-                self.__position,
-                legal_actions
-            )
-
-        return self.__chase_behaviour.calculate_best_move(
-            pakman,
-            self.__position,
-            legal_actions
-        )
+    self.__steps += 1
+    if self.__isScared:
+      self.__scaredSteps += 1
