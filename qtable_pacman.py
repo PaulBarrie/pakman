@@ -24,7 +24,7 @@ class QtablePacman(Pacman):
   def temperature(self) -> float:
       return self.__temperature
 
-  def __init__(self, position: Position, state, qtable=None, history=None, alpha=1, gamma=0.8, cooling_rate=0.999) -> None:
+  def __init__(self, position: Position, state: State, qtable=None, history=None, alpha=1, gamma=0.8, cooling_rate=0.999) -> None:
       super().__init__(position)
 
       self.__temperature = 0.0
@@ -55,6 +55,7 @@ class QtablePacman(Pacman):
     prevLives = self._lives
 
     state, reward, self._position = game.do(self._position, action, self.__state)
+    # print(f"same state ? {self.__state == state}")
     maxQ = max(self.__qtable_get_or_create(state).values())
     delta = self.__alpha * (reward + self.__gamma * maxQ - self.__qtable_get_or_create(self.__state)[action])
     self.qtable[self.__state][action] += delta
@@ -81,7 +82,7 @@ class QtablePacman(Pacman):
     with open(filename, 'wb') as file:
       pickle.dump((self.qtable, self.__history), file)
 
-  def __repr__(self) -> str:
-    res = f'Agent {self.__state}\n'
-    res += str(self.qtable)
-    return res
+  # def __repr__(self) -> str:
+  #   res = f'Agent {self.__state}\n'
+  #   res += str(self.qtable)
+  #   return res

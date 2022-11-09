@@ -14,7 +14,7 @@ GRAPHICAL_INTERFACE = True
 
 if __name__ == '__main__':
     environment = Environment.from_str_map(maps.GAME2)
-    initial_state = State.compute_state(
+    initial_state = compute_state(
         environment.ghost_positions, 
         environment.initial_pakman_position,
         environment.gums,

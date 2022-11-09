@@ -7,7 +7,7 @@ from inky import Inky
 from pacman import Pacman
 from pinky import Pinky
 from position import Position
-from state import State
+from state import State, compute_state
 from world import World
 
 
@@ -16,6 +16,7 @@ GUM_REWARD = 100
 GHOST_REWARD = -500
 WALL_REWARD = -1000
 WIN_REWARD = 1000
+AGENTS = 5
 
 class Game:
   @property
@@ -55,9 +56,22 @@ class Game:
     self.__moves = moves
     self.__rounds = rounds
     self.__isGameOver = isGameOver
+    self.__internalMovesCount = 0
+    self.__pacmanRespawnLocation = Position(
+      config["pacman"]["position"][0], 
+      config["pacman"]["position"][1]
+    )
 
   def move(self) -> None:
-    self.__pacman.step(self)
+    if len(self.__ghosts) and self.__internalMovesCount < AGENTS - 1:
+      currentGhost = self.__ghosts[self.__internalMovesCount]
+      currentGhost.move(self.__world, self.__pacman)
+      if currentGhost.position == self.__pacman.position:
+        self.__pacman.die(self.__pacmanRespawnLocation)
+        self.resetGhosts()
+    else:
+      self.__pacman.step(self)
+    self.__internalMovesCount = (self.__internalMovesCount + 1) % AGENTS
 
   # never call this method in a window / context
   # called by Pacman when moving
@@ -66,63 +80,62 @@ class Game:
   #  - the reward
   #  - the next position 
   def do(self, position: Position, action: Action, state: State) -> tuple[State, float, Position]:
-    for ghost in self.__ghosts:
-      ghost.move(self.__world, self.__pacman)
+    # for ghost in self.__ghosts:
+    #   ghost.move(self.__world, self.__pacman)
     self.__moves += 1
 
     next_position = position.apply_action(action)
 
-    if self.__pacman.position in self.__getGhostPositions():
-      print("Pacman died !")
-      respawnPosition = Position(self.__config["pacman"]["position"][0], self.__config["pacman"]["position"][1])
-      self.__pacman.die()
+    if next_position in self.__getGhostPositions():
+      # print("Pacman died !")
+      self.__pacman.die(self.__pacmanRespawnLocation)
       self.resetGhosts()
-      resetState = State.compute_state(
+      resetState = compute_state(
         self.__getGhostPositions(), 
-        respawnPosition, 
-        self.__world.gums, 
+        self.__pacmanRespawnLocation, 
+        self.__world.getGums(), 
         self.__world.walls
       )
 
       if self.__pacman.lives <= 0:
         self.__isGameOver = True
-      return (resetState, GHOST_REWARD, respawnPosition)
+      return (resetState, GHOST_REWARD, self.__pacmanRespawnLocation)
 
-    pacmanRow = self.__pacman.position.row
-    pacmanColumn = self.__pacman.position.column
+    pacmanRow = next_position.row
+    pacmanColumn = next_position.column
     targetTile = self.__world[pacmanRow][pacmanColumn]
 
     ## special logic when a gum is eaten
     if targetTile.isGum or targetTile.isSuperGum:
-      print("Pacman ate a gum !")
+      # print("Pacman ate a gum !")
       targetTile.empty()
-      nextState = State.compute_state(
+      nextState = compute_state(
         self.__getGhostPositions(), 
         self.__pacman.position, 
-        self.__world.gums, 
+        self.__world.getGums(), 
         self.__world.walls
       )
 
       reward = GUM_REWARD
       # all gums were eaten
-      if len(self.__world.gums) == 0:
+      if len(self.__world.getGums()) == 0:
         reward = WIN_REWARD
         self.__isGameOver = True
       return (nextState, reward, next_position)
 
     ## pacman does not move but gets a bump on the head !
     if targetTile.isWall:
-      print("Pacman bump ots head on a wall !")
+      # print("Pacman bump ots head on a wall !")
       return (state, WALL_REWARD, self.__pacman.position)
 
-    nextState = State.compute_state(
+    nextState = compute_state(
       self.__getGhostPositions(), 
       self.__pacman.position, 
-      self.__world.gums, 
+      self.__world.getGums(), 
       self.__world.walls
     )
     if targetTile.isEmpty:
-      print("Pacman moved !")
+      # print("Pacman moved !")
       return (nextState, DEFAULT_REWARD, next_position)
 
     raise Exception("Invalid move or state")

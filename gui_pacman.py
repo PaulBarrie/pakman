@@ -7,7 +7,7 @@ from game import Game
 from pacman import Pacman
 from position import Position
 from qtable_pacman import QtablePacman
-from state import State
+from state import State, compute_state
 from world import World
 
 SAVE_FILE = "qtable.dat"
@@ -69,7 +69,7 @@ class PacmanGUI(arcade.Window):
         sprite.center_x, sprite.center_y = self.position_to_xy(self.__game.ghosts[i].position)
         self.__ghosts.append(sprite)
 
-      for gum in self.__game.world.gums:
+      for gum in self.__game.world.getGums():
         sprite = arcade.Sprite('static/gum.png', GUM_SCALE)
         sprite.center_x, sprite.center_y = self.position_to_xy(gum)
         self.__gums.append(sprite)
@@ -87,7 +87,7 @@ class PacmanGUI(arcade.Window):
 
     self.__walls.draw()
     self.__gums.clear()
-    for gum in self.__game.world.gums:
+    for gum in self.__game.world.getGums():
       sprite = arcade.Sprite('static/gum.png', GUM_SCALE)
       sprite.center_x, sprite.center_y = self.position_to_xy(gum)
       self.__gums.append(sprite)
@@ -128,11 +128,11 @@ def pFactory(config, world: World) -> Pacman:
   #   Position(config["clyde"]["position"][0], config["clyde"]["position"][1])
   # ]
   ghosts = []
-  state = State.compute_state(
+  state = compute_state(
     pacman_position=position,
     ghost_positions=ghosts,
-    gum_positions=world.gums,
-    wall_positions=world.gums
+    gum_positions=world.getGums(),
+    wall_positions=world.walls
   )
 
   return QtablePacman(

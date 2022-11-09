@@ -21,11 +21,11 @@ class Pacman:
     self._direction = direction
     self._lives = lives
 
-  def die(self) -> None:
+  def die(self, respawnPosition: Position) -> None:
     if self._lives > 0:
       self._lives -= 1
+    self._position = respawnPosition
     self._direction = Direction.WEST
-    # print("Pacman died")
 
   def _best_action(self) -> Action:
     raise NotImplemented()

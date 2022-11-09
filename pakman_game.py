@@ -51,7 +51,7 @@ class PakmanGame:
     def reset(self):
         self.__iteration += 1
         self.__environment = Environment.from_str_map(self.__environment.str_map)
-        initial_state = State.compute_state(
+        initial_state = compute_state(
             self.__environment.ghost_positions, 
             self.__environment.initial_pakman_position,
             self.__environment.gums,

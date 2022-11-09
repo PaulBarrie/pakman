@@ -1,9 +1,10 @@
+from actions import Action
 from position import Position
 from qtable_pacman import QtablePacman
 from config import GAME1, GAME1_NO_GHOSTS
 from game import Game
 from pacman import Pacman
-from state import State
+from state import State, compute_state
 from world import World
 
 
@@ -19,11 +20,11 @@ def pFactory(config, world: World) -> Pacman:
       Position(config["inky"]["position"][0], config["inky"]["position"][1]),
       Position(config["clyde"]["position"][0], config["clyde"]["position"][1])
     ]
-  state = State.compute_state(
+  state = compute_state(
     pacman_position=position,
     ghost_positions=ghosts,
-    gum_positions=world.gums,
-    wall_positions=world.gums
+    gum_positions=world.getGums(),
+    wall_positions=world.walls
   )
 
   return QtablePacman(
@@ -36,22 +37,23 @@ if __name__ == '__main__':
   game = Game(GAME1_NO_GHOSTS, pacmanFactory=pFactory)
 
   print("training without ghosts")
-  while game.rounds < 1:
+  while game.rounds < 20:
     game.move()
 
     if game.moves >= 500 or game.isGameOver:
-      print(f"round n° {game.rounds} is over")
+      # print(f"round n° {game.rounds} is over")
       game.setNextRound()
 
-  # game = Game(GAME1, pacmanFactory=pFactory)
+  game = Game(GAME1, pacmanFactory=pFactory)
 
-  # print("training with ghosts")
-  # while game.rounds < 20:
-  #   game.move()
+  print("training with ghosts")
+  while game.rounds < 20:
+    game.move()
 
-  #   if game.moves >= 500 or game.isGameOver:
-  #     print(f"round n° {game.rounds} is over")
-  #     game.setNextRound()
+    if game.moves >= 500 or game.isGameOver:
+      # print(f"round n° {game.rounds} is over")
+      game.setNextRound()
 
-  # game.pacman.save(SAVE_FILE)
-  print(len(game.pacman.qtable))
+  print(game.pacman.qtable)
+  if len(game.pacman.qtable):
+    game.pacman.save(SAVE_FILE)

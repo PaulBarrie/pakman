@@ -23,7 +23,7 @@ class Direction(str, Enum):
 
   @staticmethod
   def as_list() -> list[Direction]:
-    return [Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST]
+    return [Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST]
 
 
         

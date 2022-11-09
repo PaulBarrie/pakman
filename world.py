@@ -11,25 +11,16 @@ MAP_BLANK = " "
 
 class World:
   @property
-  def walls(self) -> list[Position]:
-    return self.__walls
-
-  @property
-  def gums(self) -> list[Position]:
-    positions = []
-    for row in range(len(self.__tiles)):
-      for col in range(len(self.__tiles[row])):
-        if self.__tiles[row][col].isGum or self.__tiles[row][col].isSuperGum:
-          positions.append(Position(row, col))
-    return positions
-
-  @property
   def width(self) -> int:
     return len(self.__tiles[0])
 
   @property
   def height(self) -> int:
     return len(self.__tiles)
+
+  @property
+  def walls(self) -> list[Position]:
+    return self.__walls
 
   def __init__(self, tiles: list[list[Tile]]) -> None:
     self.__tiles = tiles
@@ -54,13 +45,22 @@ class World:
     for row in range(len(self.__tiles)):
       for col in range(len(self.__tiles[row])):
         if self.__tiles[row][col].isWall:
+          #print(f"{row} - {col}\n\n")
+          positions.append(Position(row, col))
+    return positions
+
+  def getGums(self) -> list[Position]:
+    positions = []
+    for row in range(len(self.__tiles)):
+      for col in range(len(self.__tiles[row])):
+        if self.__tiles[row][col].isGum or self.__tiles[row][col].isSuperGum:
           positions.append(Position(row, col))
     return positions
 
   @staticmethod
   def parseArray(world: str) -> World:
     str_map = world.strip().split("\n")
-    tiles: list[list[Tile]] = [[] for x in str_map]
+    tiles: list[list[Tile]] = [[] for _ in str_map]
 
     row = 0
     for line in str_map:
