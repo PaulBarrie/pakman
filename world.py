@@ -23,6 +23,14 @@ class World:
           positions.append(Position(row, col))
     return positions
 
+  @property
+  def width(self) -> int:
+    return len(self.__tiles[0])
+
+  @property
+  def height(self) -> int:
+    return len(self.__tiles)
+
   def __init__(self, tiles: list[list[Tile]]) -> None:
     self.__tiles = tiles
     self.__walls = self.__getWalls()

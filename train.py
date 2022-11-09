@@ -36,21 +36,22 @@ if __name__ == '__main__':
   game = Game(GAME1_NO_GHOSTS, pacmanFactory=pFactory)
 
   print("training without ghosts")
-  while game.rounds < 20:
+  while game.rounds < 1:
     game.move()
 
     if game.moves >= 500 or game.isGameOver:
       print(f"round n° {game.rounds} is over")
       game.setNextRound()
 
-  game = Game(GAME1, pacmanFactory=pFactory)
+  # game = Game(GAME1, pacmanFactory=pFactory)
 
-  print("training with ghosts")
-  while game.rounds < 20:
-    game.move()
+  # print("training with ghosts")
+  # while game.rounds < 20:
+  #   game.move()
 
-    if game.moves >= 500 or game.isGameOver:
-      print(f"round n° {game.rounds} is over")
-      game.setNextRound()
+  #   if game.moves >= 500 or game.isGameOver:
+  #     print(f"round n° {game.rounds} is over")
+  #     game.setNextRound()
 
-  game.pacman.save()
+  # game.pacman.save(SAVE_FILE)
+  print(len(game.pacman.qtable))

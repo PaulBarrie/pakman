@@ -10,7 +10,7 @@ class Pacman:
 
   @property
   def lives(self) -> int:
-    return self.__lives
+    return self._lives
 
   @property
   def direction(self) -> Direction:
@@ -19,12 +19,11 @@ class Pacman:
   def __init__(self, position: Position, direction = Direction.WEST, lives: int = 3) -> None:
     self._position = position
     self._direction = direction
-    self.__lives = lives
+    self._lives = lives
 
-  def die(self, respawnPosition: Position) -> None:
-    if self.__lives > 0:
-      self.__lives -= 1
-    self._position = respawnPosition
+  def die(self) -> None:
+    if self._lives > 0:
+      self._lives -= 1
     self._direction = Direction.WEST
     # print("Pacman died")
 

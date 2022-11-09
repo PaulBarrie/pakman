@@ -64,16 +64,18 @@ class Game:
   # returns a tuple containing
   #  - the new state
   #  - the reward
-  def do(self, action: Action, state: State) -> tuple[Any, float]:
+  #  - the next position 
+  def do(self, position: Position, action: Action, state: State) -> tuple[State, float, Position]:
     for ghost in self.__ghosts:
       ghost.move(self.__world, self.__pacman)
     self.__moves += 1
 
-    ## add reward and next state logic here
-    ## add state computation !!
+    next_position = position.apply_action(action)
+
     if self.__pacman.position in self.__getGhostPositions():
+      print("Pacman died !")
       respawnPosition = Position(self.__config["pacman"]["position"][0], self.__config["pacman"]["position"][1])
-      self.__pacman.die(respawnPosition)
+      self.__pacman.die()
       self.resetGhosts()
       resetState = State.compute_state(
         self.__getGhostPositions(), 
@@ -84,15 +86,34 @@ class Game:
 
       if self.__pacman.lives <= 0:
         self.__isGameOver = True
-      return (resetState, GHOST_REWARD)
+      return (resetState, GHOST_REWARD, respawnPosition)
 
     pacmanRow = self.__pacman.position.row
     pacmanColumn = self.__pacman.position.column
     targetTile = self.__world[pacmanRow][pacmanColumn]
 
-    ## eat gum before computing next state
+    ## special logic when a gum is eaten
     if targetTile.isGum or targetTile.isSuperGum:
+      print("Pacman ate a gum !")
       targetTile.empty()
+      nextState = State.compute_state(
+        self.__getGhostPositions(), 
+        self.__pacman.position, 
+        self.__world.gums, 
+        self.__world.walls
+      )
+
+      reward = GUM_REWARD
+      # all gums were eaten
+      if len(self.__world.gums) == 0:
+        reward = WIN_REWARD
+        self.__isGameOver = True
+      return (nextState, reward, next_position)
+
+    ## pacman does not move but gets a bump on the head !
+    if targetTile.isWall:
+      print("Pacman bump ots head on a wall !")
+      return (state, WALL_REWARD, self.__pacman.position)
 
     nextState = State.compute_state(
       self.__getGhostPositions(), 
@@ -100,19 +121,9 @@ class Game:
       self.__world.gums, 
       self.__world.walls
     )
-    if targetTile.isWall:
-      return (state, WALL_REWARD)
-
-    if targetTile.isGum or targetTile.isSuperGum:
-      reward = GUM_REWARD
-      # all gums were eaten
-      if len(self.__world.gums) == 0:
-        reward = WIN_REWARD
-        self.__isGameOver = True
-      return (nextState, reward)
-
     if targetTile.isEmpty:
-      return (nextState, DEFAULT_REWARD)
+      print("Pacman moved !")
+      return (nextState, DEFAULT_REWARD, next_position)
 
     raise Exception("Invalid move or state")
 
