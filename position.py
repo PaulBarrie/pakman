@@ -23,6 +23,9 @@ class Position:
             and self.__row == __o.row \
             and self.__column == __o.column
 
+    def __hash__(self) -> int:
+        return hash((self.__row, self.__column))
+
     def get_distance(self, other: Position) -> int:
         return abs(self.__row - other.row) + abs(self.__column - other.column)
 

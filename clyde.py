@@ -14,13 +14,13 @@ class Clyde(Ghost):
 
     target = pacman.position
     # target pacman but retreat to corner when getting too close
-    if self.__isScattering or self.__isScared or manhattan_distance(self.__position, pacman) <= 4:
-      target = self.__corner
+    if self._isScattering or self._isScared or manhattan_distance(self._position, pacman.position) <= 4:
+      target = self._corner
 
-    legal_actions = world.get_legal_actions(self.__position)
+    legal_actions = world.get_legal_actions(self._position)
     best_action = list(sorted(
       legal_actions,
-      key=lambda action: manhattan_distance(self.__position.apply_action(action), target)
+      key=lambda action: manhattan_distance(self._position.apply_action(action), target)
     ))[0]
 
-    self.__position = self.__position.apply_action(best_action)
+    self._position = self._position.apply_action(best_action)
