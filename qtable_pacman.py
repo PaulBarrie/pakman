@@ -55,7 +55,6 @@ class QtablePacman(Pacman):
     prevLives = self._lives
 
     state, reward, self._position = game.do(self._position, action, self.__state)
-    # print(f"same state ? {self.__state == state}")
     maxQ = max(self.__qtable_get_or_create(state).values())
     delta = self.__alpha * (reward + self.__gamma * maxQ - self.__qtable_get_or_create(self.__state)[action])
     self.qtable[self.__state][action] += delta
@@ -66,7 +65,7 @@ class QtablePacman(Pacman):
     self.__score += reward
     self.__history.append(self.__score)
 
-    # print("Pacman moved")
+    # print(f"{state}")
 
   def __qtable_get_or_create(self, state: State) -> dict[Action, float]:
     return self.qtable.setdefault(

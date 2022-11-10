@@ -42,6 +42,11 @@ def getThreat(position: Position, pacman: Position, walls: list[Position]) -> Di
 
 State = tuple[bool, bool, bool, bool, int, bool, bool, bool, bool, bool]
 
+## STATE
+## north wall - west wall - south wall - east wall (booleans)
+## direction of next target (int)
+## threat north - threat west - threat south - threat east (booleans)
+## trapped (boolean)
 def compute_state(
   ghost_positions: list[Position], 
   pacman_position: Position, 

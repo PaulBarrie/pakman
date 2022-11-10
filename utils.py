@@ -17,7 +17,7 @@ def aStarSearch(start: Position, targets: list[Position], obstacles: list[Positi
   frontier.append((start, [], 0))
 
   while(len(frontier)):
-    pos, directions, dist = frontier.popleft()
+    pos, directions, dist = frontier.pop()
     explored.add(pos)
     if pos in targets:
       # print(f"found {directions}")

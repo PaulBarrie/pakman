@@ -46,7 +46,7 @@ class Game:
   # pass params
   # and a pacman factory -> it can create, from a config and a world,
   # an instance of QtablePacman or any other subclass of Pacman !
-  def __init__(self, config, pacmanFactory: Callable[[Any, World], Pacman], moves=0, rounds=0, isGameOver=False) -> None:
+  def __init__(self, config, pacmanFactory: Callable[[Any, World, Any], Pacman], moves=0, rounds=0, isGameOver=False) -> None:
     self.__config = config
     self.__pacmanFactory = pacmanFactory
 
@@ -147,7 +147,7 @@ class Game:
     self.resetGhosts()
     # reset the world before resetting Pacman !
     self.__world = self.__generateWorld(self.__config)
-    self.__pacman = self.__pacmanFactory(self.__config, self.__world)
+    self.__pacman = self.__pacmanFactory(self.__config, self.__world, self.__pacman.qtable)
     self.__moves = 0
     self.__rounds += 1
     self.__isGameOver = False

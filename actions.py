@@ -58,4 +58,8 @@ class Action(tuple[int, int], Enum):
 
     @staticmethod
     def as_list() -> list[Action]:
-        return [Action.UP, Action.DOWN, Action.LEFT, Action.RIGHT]
+        return [Action.UP, Action.LEFT, Action.DOWN, Action.RIGHT]
+
+    # @staticmethod
+    # def asReverseList() -> list[Action]:
+    #     return [Action.UP, Action.DOWN, Action.LEFT, Action.RIGHT, Action.LEFT, Action.DOWN]

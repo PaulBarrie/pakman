@@ -118,16 +118,16 @@ class PacmanGUI(arcade.Window):
     self.__pacman.update()
     self.__pacman.center_x, self.__pacman.center_y = self.position_to_xy(self.__game.pacman.position)
 
-def pFactory(config, world: World) -> Pacman:
+def pFactory(config, world: World, qtable = None) -> Pacman:
   position = position=Position(config["pacman"]["position"][0], config["pacman"]["position"][1])
 
-  # ghosts = [
-  #   Position(config["blinky"]["position"][0], config["blinky"]["position"][1]),
-  #   Position(config["pinky"]["position"][0], config["pinky"]["position"][1]),
-  #   Position(config["inky"]["position"][0], config["inky"]["position"][1]),
-  #   Position(config["clyde"]["position"][0], config["clyde"]["position"][1])
-  # ]
-  ghosts = []
+  ghosts = [
+    Position(config["blinky"]["position"][0], config["blinky"]["position"][1]),
+    Position(config["pinky"]["position"][0], config["pinky"]["position"][1]),
+    Position(config["inky"]["position"][0], config["inky"]["position"][1]),
+    Position(config["clyde"]["position"][0], config["clyde"]["position"][1])
+  ]
+  # ghosts = []
   state = compute_state(
     pacman_position=position,
     ghost_positions=ghosts,
@@ -137,12 +137,13 @@ def pFactory(config, world: World) -> Pacman:
 
   return QtablePacman(
     position=position,
-    state=state
+    state=state,
+    qtable=qtable
   )
 
 
 if __name__ == "__main__":
-  game = Game(GAME1_NO_GHOSTS, pacmanFactory=pFactory)
+  game = Game(GAME1, pacmanFactory=pFactory)
 
   if os.path.exists(SAVE_FILE):
     game.pacman.load(SAVE_FILE)
