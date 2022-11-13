@@ -9,6 +9,10 @@ class Pacman:
     return self._position
 
   @property
+  def initialPosition(self) -> Position:
+    return self._initialPosition
+
+  @property
   def lives(self) -> int:
     return self._lives
 
@@ -18,7 +22,9 @@ class Pacman:
 
   def __init__(self, position: Position, direction = Direction.WEST, lives: int = 3) -> None:
     self._position = position
+    self._initialPosition = position
     self._direction = direction
+    self._maxLives = lives
     self._lives = lives
 
   def die(self, respawnPosition: Position) -> None:

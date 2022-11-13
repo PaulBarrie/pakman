@@ -1,6 +1,6 @@
 import pickle
 from random import choice, random
-from actions import Action
+from actions import Action, Direction
 from game import Game
 from pacman import Pacman
 from position import Position
@@ -24,7 +24,7 @@ class QtablePacman(Pacman):
   def temperature(self) -> float:
       return self.__temperature
 
-  def __init__(self, position: Position, state: State, qtable=None, history=None, alpha=1, gamma=0.8, cooling_rate=0.999) -> None:
+  def __init__(self, position: Position, state: State, qtable=None, history=None, alpha=1.0, gamma=0.8, cooling_rate=0.999) -> None:
       super().__init__(position)
 
       self.__temperature = 0.0
@@ -38,6 +38,7 @@ class QtablePacman(Pacman):
       self.__gamma = gamma
       self.__history = history if history != None else []
       self.__cooling_rate = cooling_rate
+      print(len(self.qtable))
 
   def heat(self) -> None:
       self.__temperature = 1.0
@@ -52,20 +53,16 @@ class QtablePacman(Pacman):
 
   def step(self, game: Game) -> None:
     action = self._best_action()
-    prevLives = self._lives
-
+    # print(f"{self.__state} | {action}")
     state, reward, self._position = game.do(self._position, action, self.__state)
     maxQ = max(self.__qtable_get_or_create(state).values())
     delta = self.__alpha * (reward + self.__gamma * maxQ - self.__qtable_get_or_create(self.__state)[action])
     self.qtable[self.__state][action] += delta
 
-    if prevLives == self._lives:
-      self._direction = action.to_direction()
+    self._direction = action.to_direction()
     self.__state = state
     self.__score += reward
     self.__history.append(self.__score)
-
-    # print(f"{state}")
 
   def __qtable_get_or_create(self, state: State) -> dict[Action, float]:
     return self.qtable.setdefault(
@@ -80,6 +77,13 @@ class QtablePacman(Pacman):
   def save(self, filename = "qtable.dat") -> None:
     with open(filename, 'wb') as file:
       pickle.dump((self.qtable, self.__history), file)
+
+  def reset(self, state: State) -> None:
+    self._lives = self._maxLives
+    self._position = self._initialPosition
+    self._direction = Direction.WEST
+    self.__state = state
+    print(len(self.qtable))
 
   # def __repr__(self) -> str:
   #   res = f'Agent {self.__state}\n'

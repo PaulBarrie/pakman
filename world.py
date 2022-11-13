@@ -35,6 +35,10 @@ class World:
       Action.as_list()
     ))
 
+  def isInBounds(self, position: Position) -> bool:
+    return 0 <= position.row and position.row < self.width \
+      and 0 <= position.column and position.column < self.height
+
   def __isWall(self, position: Position) -> bool:
     return 0 <= position.row and position.row < len(self.__tiles) \
       and 0 <= position.column and position.column < len(self.__tiles[0]) \

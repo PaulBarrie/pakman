@@ -4,19 +4,17 @@ from blinky import Blinky
 from clyde import Clyde
 from ghost import Ghost
 from inky import Inky
-from pacman import Pacman
 from pinky import Pinky
 from position import Position
 from state import State, compute_state
 from world import World
 
 
-DEFAULT_REWARD = -50
-GUM_REWARD = 100
+DEFAULT_REWARD = -100
+GUM_REWARD = -DEFAULT_REWARD
 GHOST_REWARD = -500
 WALL_REWARD = -1000
 WIN_REWARD = 1000
-AGENTS = 5
 
 class Game:
   @property
@@ -28,7 +26,7 @@ class Game:
     return self.__ghosts
 
   @property
-  def pacman(self) -> Pacman:
+  def pacman(self):
     return self.__pacman
 
   @property
@@ -46,7 +44,7 @@ class Game:
   # pass params
   # and a pacman factory -> it can create, from a config and a world,
   # an instance of QtablePacman or any other subclass of Pacman !
-  def __init__(self, config, pacmanFactory: Callable[[Any, World, Any], Pacman], moves=0, rounds=0, isGameOver=False) -> None:
+  def __init__(self, config, pacmanFactory, moves=0, rounds=0, isGameOver=False) -> None:
     self.__config = config
     self.__pacmanFactory = pacmanFactory
 
@@ -62,8 +60,10 @@ class Game:
       config["pacman"]["position"][1]
     )
 
+    self.__agentCount = 1 + len(self.__ghosts)
+
   def move(self) -> None:
-    if len(self.__ghosts) and self.__internalMovesCount < AGENTS - 1:
+    if len(self.__ghosts) and self.__internalMovesCount < self.__agentCount - 1:
       currentGhost = self.__ghosts[self.__internalMovesCount]
       currentGhost.move(self.__world, self.__pacman)
       if currentGhost.position == self.__pacman.position:
@@ -71,7 +71,7 @@ class Game:
         self.resetGhosts()
     else:
       self.__pacman.step(self)
-    self.__internalMovesCount = (self.__internalMovesCount + 1) % AGENTS
+    self.__internalMovesCount = (self.__internalMovesCount + 1) % self.__agentCount
 
   # never call this method in a window / context
   # called by Pacman when moving
@@ -83,7 +83,7 @@ class Game:
     # for ghost in self.__ghosts:
     #   ghost.move(self.__world, self.__pacman)
     self.__moves += 1
-
+    # print(action)
     next_position = position.apply_action(action)
 
     if next_position in self.__getGhostPositions():
@@ -124,7 +124,7 @@ class Game:
       return (nextState, reward, next_position)
 
     ## pacman does not move but gets a bump on the head !
-    if targetTile.isWall:
+    if targetTile.isWall or not self.__world.isInBounds(next_position):
       # print("Pacman bump ots head on a wall !")
       return (state, WALL_REWARD, self.__pacman.position)
 
@@ -147,7 +147,12 @@ class Game:
     self.resetGhosts()
     # reset the world before resetting Pacman !
     self.__world = self.__generateWorld(self.__config)
-    self.__pacman = self.__pacmanFactory(self.__config, self.__world, self.__pacman.qtable)
+    self.__pacman.reset(compute_state(
+      self.__getGhostPositions(), 
+      self.__pacman.initialPosition, 
+      self.__world.getGums(), 
+      self.__world.walls
+    ))
     self.__moves = 0
     self.__rounds += 1
     self.__isGameOver = False
@@ -156,27 +161,39 @@ class Game:
     return World.parseArray(config["strMap"])
 
   def __generateGhosts(self, config) -> list[Ghost]:
-    if not config.get("blinky") or not config.get("pinky") or not config.get("inky") or not config.get("clyde"):
-      return []
+    ghosts = []
+    blinky = None
+ 
+    if config.get("blinky"):
+      blinky = Blinky(
+        position=Position(config["blinky"]["position"][0], config["blinky"]["position"][1]),
+        corner=Position(config["blinky"]["corner"][0], config["blinky"]["corner"][1])
+      )
+      ghosts.append(blinky)
+      
+    if blinky is not None and config.get("inky"):
+      inky = Inky(
+        position=Position(config["inky"]["position"][0], config["inky"]["position"][1]),
+        corner=Position(config["inky"]["corner"][0], config["inky"]["corner"][1]),
+        blinky=blinky
+      )
+      ghosts.append(inky)
 
-    blinky = Blinky(
-      position=Position(config["blinky"]["position"][0], config["blinky"]["position"][1]),
-      corner=Position(config["blinky"]["corner"][0], config["blinky"]["corner"][1])
-    )
-    pinky = Pinky(
-      position=Position(config["pinky"]["position"][0], config["pinky"]["position"][1]),
-      corner=Position(config["pinky"]["corner"][0], config["pinky"]["corner"][1])
-    )
-    inky = Inky(
-      position=Position(config["inky"]["position"][0], config["inky"]["position"][1]),
-      corner=Position(config["inky"]["corner"][0], config["inky"]["corner"][1]),
-      blinky=blinky
-    )
-    clyde = Clyde(
-      position=Position(config["clyde"]["position"][0], config["clyde"]["position"][1]),
-      corner=Position(config["clyde"]["corner"][0], config["clyde"]["corner"][1])
-    )
-    return [blinky, pinky, inky, clyde]
+    if config.get("pinky"):
+      pinky = Pinky(
+        position=Position(config["pinky"]["position"][0], config["pinky"]["position"][1]),
+        corner=Position(config["pinky"]["corner"][0], config["pinky"]["corner"][1])
+      )
+      ghosts.append(pinky)
+    
+    if config.get("clyde"):
+      clyde = Clyde(
+        position=Position(config["clyde"]["position"][0], config["clyde"]["position"][1]),
+        corner=Position(config["clyde"]["corner"][0], config["clyde"]["corner"][1])
+      )
+      ghosts.append(clyde)
+
+    return ghosts
 
   def __getGhostPositions(self) -> list[Position]:
     return list(map(lambda g: g.position, self.__ghosts))

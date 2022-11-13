@@ -28,13 +28,13 @@ GAME1 = {
     "position": (1, 20),
     "corner": (0, 27)
   },
-  "pinky": {
-    "position": (16, 2),
-    "corner": (17, 0)
-  },
   "inky": {
     "position": (1, 9),
     "corner": (0, 0)
+  },
+  "pinky": {
+    "position": (16, 2),
+    "corner": (17, 0)
   },
   "clyde": {
     "position": (16, 19),
@@ -49,5 +49,58 @@ GAME1_NO_GHOSTS = {
   "strMap": game1Map,
   "pacman": {
     "position": (11, 14)
+  }
+}
+
+game2Map = """
+###########
+#....#....#
+#.##.#.##.#
+#.#.....#.#
+#.#.###.#.#
+#.........#
+#.#.###.#.#
+#.#.....#.#
+#.##.#.##.#
+# ...#....#
+###########
+"""
+GAME2 = {
+  "strMap": game2Map,
+  "blinky": {
+    "position": (1, 9),
+    "corner": (0, 10)
+  },
+  # "inky": {
+  #   "position": (5, 6),
+  #   "corner": (0, 0)
+  # },
+  "pacman": {
+    "position": (9, 1)
+  }
+}
+
+GAME2_NO_GHOSTS = {
+  "strMap": game2Map,
+  "pacman": {
+    "position": (9, 1)
+  }
+}
+
+game3Map = """
+#######
+#.....#
+#.....#
+#.###.#
+#.....#
+#.###.#
+# ....#
+#######
+"""
+
+GAME3 = {
+  "strMap": game3Map,
+  "pacman": {
+    "position": (6, 1)
   }
 }

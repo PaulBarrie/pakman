@@ -29,7 +29,8 @@ def aStarSearch(start: Position, targets: list[Position], obstacles: list[Positi
     for action in Action.as_list():
       next_pos = pos.apply_action(action)
       direction = action.to_direction()
-      if next_pos not in obstacles and next_pos not in explored:
-        frontier.append((next_pos, directions + [direction], dist + 1))
+      if next_pos in obstacles or next_pos in frontier or next_pos in explored:
+        continue
+      frontier.append((next_pos, directions + [direction], dist + 1))
   # print("found nothing in a star")
   return None
