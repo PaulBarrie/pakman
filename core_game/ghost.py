@@ -36,7 +36,6 @@ class Ghost:
         self.__direction = optimum_action.to_direction()
 
         if self.__position == pakman.position:
-            # print("An imperialist has hunted the Pakman down!")
             pakman.die()
             return (optimum_action, -1.0, initial_pakman_position)
 

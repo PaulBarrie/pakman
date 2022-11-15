@@ -21,7 +21,6 @@ REWARD_DEFAULT = -GUM_REWARD / 5
 LONG_RANGE_RADAR_STATES = 2 ** 4 * 3
 SHORT_RANGE_RADAR_STATES = 2 ** 4
 AREA_RADAR_STATES = 2 ** 8
-# POSITION_STATES = 21 * 28
 NB_STATES = LONG_RANGE_RADAR_STATES * SHORT_RANGE_RADAR_STATES * SHORT_RANGE_RADAR_STATES
 REWARD_GHOST = -NB_STATES
 REWARD_WALL = REWARD_GHOST / 10
@@ -151,7 +150,6 @@ class Environment:
 
         if next_position in self.ghost_positions:
             reset_state = State.compute_state(self.ghost_positions, position, self.__gums, self.__walls)
-            # print("The Pakman stumbled upon an imperialist !")
             return (self.__initial_pakman_position, reset_state, REWARD_GHOST, True)
 
         if next_position in self.__walls:
@@ -159,13 +157,6 @@ class Environment:
 
         if next_position in self.__gums:
             self.__gums.remove(next_position)
-            # return (next_position, next_state, self.gum_reward(), False)
             return (next_position, next_state, GUM_REWARD, False)
 
         return (next_position, next_state, REWARD_DEFAULT, False)
-
-    # def gum_reward(self):
-    #     # remaining_gums = len(self.gums)
-    #     # if remaining_gums == 0 : return NB_STATES
-    #     # return self.__total_gums - len(self.__gums)
-    #     return len(self.)
