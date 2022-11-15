@@ -32,14 +32,14 @@ GAME1 = {
     "position": (1, 9),
     "corner": (0, 0)
   },
-  "pinky": {
-    "position": (16, 2),
-    "corner": (17, 0)
-  },
-  "clyde": {
-    "position": (16, 19),
-    "corner": (17, 27)
-  },
+  # "pinky": {
+  #   "position": (16, 2),
+  #   "corner": (17, 0)
+  # },
+  # "clyde": {
+  #   "position": (16, 19),
+  #   "corner": (17, 27)
+  # },
   "pacman": {
     "position": (11, 14)
   }

@@ -58,7 +58,7 @@ def getLongRangeRadar(position: Position, targets: list[Position]) -> tuple[bool
     dist
   )
 
-MAX_RANGE = 3
+MAX_RANGE = 4
 def getAreaRadar(position: Position, threats: list[Position]) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool]:
   threatN = False
   threatW = False
@@ -69,7 +69,7 @@ def getAreaRadar(position: Position, threats: list[Position]) -> tuple[bool, boo
   threatSW = False
   threatSE = False
 
-  directThreats = filter(lambda threat: manhattan_distance(position, threat) <= MAX_RANGE, threats)
+  directThreats = list(filter(lambda threat: manhattan_distance(position, threat) <= MAX_RANGE, threats))
   for t in directThreats:
     if t.row == position.row:
       threatW = t.column < position.column
@@ -86,9 +86,8 @@ def getAreaRadar(position: Position, threats: list[Position]) -> tuple[bool, boo
       threatNE = t.column > position.column
       continue
 
-    if t.row > position.row:
-      threatSW = t.column < position.column
-      threatSE = t.column > position.column
+    threatSW = t.column < position.column
+    threatSE = t.column > position.column
 
   return (threatN, threatW, threatS, threatE, threatNW, threatNE, threatSW, threatSE)
 
@@ -99,40 +98,7 @@ def getAreaRadar(position: Position, threats: list[Position]) -> tuple[bool, boo
 ## threat north - threat west - threat south - threat east (booleans)
 ## trapped (boolean)
 
-# State = tuple[bool, bool, bool, bool, int, bool, bool, bool, bool, bool]
-
-# def compute_state(
-#   ghost_positions: list[Position], 
-#   pacman_position: Position, 
-#   gum_positions: list[Position], 
-#   wall_positions: list[Position]
-# ) -> State:
-
-#   wallN = pacman_position.apply_action(Action.UP) in wall_positions
-#   wallW = pacman_position.apply_action(Action.LEFT) in wall_positions
-#   wallS = pacman_position.apply_action(Action.DOWN) in wall_positions
-#   wallE = pacman_position.apply_action(Action.RIGHT) in wall_positions
-
-#   target = getTarget(pacman_position, gum_positions, wall_positions)
-
-#   threatN = False
-#   threatW = False
-#   threatS = False
-#   threatE = False
-
-#   for gp in ghost_positions:
-#     searchRes = getThreat(gp, pacman_position, wall_positions)
-#     threatN = searchRes == Direction.NORTH
-#     threatW = searchRes == Direction.WEST
-#     threatS = searchRes == Direction.SOUTH
-#     threatE = searchRes == Direction.EAST
-
-#   trapped = threatN and threatW and threatS and threatE
-#   return (wallN, wallW, wallS, wallE, target, threatN, threatW, threatS, threatE, trapped)
-
-# ORIGINAL IMPLEMENTATION
-
-State = tuple[bool, bool, bool, bool, bool, bool, bool, bool, int, bool, bool, bool, bool, bool, bool, bool, bool]
+State = tuple[bool, bool, bool, bool, int, bool, bool, bool, bool, bool]
 
 def compute_state(
   ghost_positions: list[Position], 
@@ -141,9 +107,42 @@ def compute_state(
   wall_positions: list[Position]
 ) -> State:
 
-  wallN, wallW, wallS, wallE = getShortRangeRadar(pacman_position, wall_positions)
-  gumN, gumW, gumS, gumE, gumDist = getLongRangeRadar(pacman_position, gum_positions)
-  threatN, threatW, threatS, threatE, threatNW, threatNE, threatSW , threatSE = \
-    getAreaRadar(pacman_position, ghost_positions)
+  wallN = pacman_position.apply_action(Action.UP) in wall_positions
+  wallW = pacman_position.apply_action(Action.LEFT) in wall_positions
+  wallS = pacman_position.apply_action(Action.DOWN) in wall_positions
+  wallE = pacman_position.apply_action(Action.RIGHT) in wall_positions
 
-  return (wallN, wallW, wallS, wallE, gumN, gumW, gumS, gumE, gumDist, threatN, threatW, threatS, threatE, threatNW, threatNE, threatSW, threatSE)
+  target = getTarget(pacman_position, gum_positions, wall_positions)
+
+  threatN = False
+  threatW = False
+  threatS = False
+  threatE = False
+
+  for gp in ghost_positions:
+    searchRes = getThreat(gp, pacman_position, wall_positions)
+    threatN = searchRes == Direction.NORTH
+    threatW = searchRes == Direction.WEST
+    threatS = searchRes == Direction.SOUTH
+    threatE = searchRes == Direction.EAST
+
+  trapped = threatN and threatW and threatS and threatE
+  return (wallN, wallW, wallS, wallE, target, threatN, threatW, threatS, threatE, trapped)
+
+# ORIGINAL IMPLEMENTATION
+
+# State = tuple[bool, bool, bool, bool, bool, bool, bool, bool, int, bool, bool, bool, bool, bool, bool, bool, bool]
+
+# def compute_state(
+#   ghost_positions: list[Position], 
+#   pacman_position: Position, 
+#   gum_positions: list[Position], 
+#   wall_positions: list[Position]
+# ) -> State:
+
+#   wallN, wallW, wallS, wallE = getShortRangeRadar(pacman_position, wall_positions)
+#   gumN, gumW, gumS, gumE, gumDist = getLongRangeRadar(pacman_position, gum_positions)
+#   threatN, threatW, threatS, threatE, threatNW, threatNE, threatSW , threatSE = \
+#     getAreaRadar(pacman_position, ghost_positions)
+
+#   return (wallN, wallW, wallS, wallE, gumN, gumW, gumS, gumE, gumDist, threatN, threatW, threatS, threatE, threatNW, threatNE, threatSW, threatSE)

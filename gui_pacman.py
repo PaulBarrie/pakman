@@ -56,7 +56,7 @@ class PacmanSprite(arcade.Sprite):
     
 
 class PacmanGUI(arcade.Window):
-  def __init__(self, game: Game, maxRounds = 5):
+  def __init__(self, game: Game, maxRounds = 20):
     super().__init__(
       SPRITE_SIZE * game.world.width,
       SPRITE_SIZE * game.world.height, "Pakman"
@@ -116,11 +116,9 @@ class PacmanGUI(arcade.Window):
         position_to_xy(self.__game.ghosts[i].position, self.__game.world.height)
     self.__pacman.update()
 
-    if self.__game.moves >= 1000 or self.__game.isGameOver:
+    if self.__game.moves >= 10000 or self.__game.isGameOver:
       self.__game.setNextRound()
-      print(self.__pacman.pacman == self.__game.pacman)
-      # update the ref to the pacman instance
-      # self.__pacman = PacmanSprite(self.__game.pacman, self.__game.world.height)
+      # self.__game.pacman.heat()
 
 def pFactory(config, world: World, qtable = None, history = None) -> Pacman:
   position = position=Position(config["pacman"]["position"][0], config["pacman"]["position"][1])
@@ -156,12 +154,12 @@ def pFactory(config, world: World, qtable = None, history = None) -> Pacman:
 SAVE_FILE = "qtable.dat"
 
 def launchGUI():
-  game = Game(GAME2, pacmanFactory=pFactory)
+  game = Game(GAME2_NO_GHOSTS, pacmanFactory=pFactory)
 
   if os.path.exists(SAVE_FILE):
     game.pacman.load(SAVE_FILE)
-  game.pacman.heat()
-  print(len(game.ghosts))
+  #game.pacman.heat()
+  
   gui = PacmanGUI(game)
   gui.setup()
   arcade.run()

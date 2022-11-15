@@ -8,8 +8,7 @@ def manhattan_distance(position1: Position, position2: Position) -> int:
   return abs(position1.row - position2.row) + abs(position1.column - position2.column)
 
 def aStarSearch(start: Position, targets: list[Position], obstacles: list[Position], maxDist: int = -1) -> list[Direction]:
-  if len(targets) == 0: 
-    print("No targets")
+  if len(targets) == 0:
     return None
   
   frontier: Deque[tuple[Position, list[Direction], int]] = deque()
@@ -20,7 +19,6 @@ def aStarSearch(start: Position, targets: list[Position], obstacles: list[Positi
     pos, directions, dist = frontier.pop()
     explored.add(pos)
     if pos in targets:
-      # print(f"found {directions}")
       return directions
 
     if dist == maxDist:
@@ -32,5 +30,4 @@ def aStarSearch(start: Position, targets: list[Position], obstacles: list[Positi
       if next_pos in obstacles or next_pos in frontier or next_pos in explored:
         continue
       frontier.append((next_pos, directions + [direction], dist + 1))
-  # print("found nothing in a star")
   return None

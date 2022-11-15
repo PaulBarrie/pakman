@@ -3,7 +3,7 @@ from pacman import Pacman
 from position import Position
 from world import World
 
-MOVE_COUNTDOWN = 200
+# MOVE_COUNTDOWN = 200
 
 class Ghost:
   @property
@@ -14,38 +14,41 @@ class Ghost:
   def isScared(self) -> bool:
     return self._isScared
 
-  def __init__(self, position: Position, corner: Position, steps = 0, scaredSteps = 0, isScared=False, isScattering=False, stepsToSwitchMode=40, maxScaredSteps=20) -> None:
+  def __init__(self, position: Position, corner: Position, steps=0, isScared=False, isScattering=False, maxChaseSteps=20, maxScatterSteps=30, maxScaredSteps=20) -> None:
     self._position = position
+    self.__initialPosition = position
     self._corner = corner
     self._steps = steps
-    self._scaredSteps = scaredSteps
     self._isScared = isScared
     self._isScattering = isScattering
-    self._stepsToSwitchMode = stepsToSwitchMode
+    self._maxChaseSteps = maxChaseSteps
+    self._maxScatterSteps = maxScatterSteps
     self._maxScaredSteps = maxScaredSteps
     self._direction = Direction.WEST
-    self.__moveCountDown = MOVE_COUNTDOWN
+    # self.__moveCountDown = MOVE_COUNTDOWN
 
   # specific ghost subclasss must override this method to add movement logic !
   def move(self, world: World, pacman: Pacman) -> None:
     # call this logic before calling overridden behaviour in subclasses !
-    if self.__moveCountDown:
-      self.__moveCountDown -= 1
-      return
 
-    if self._isScared and self._scaredSteps == self._maxScaredSteps:
+    if self._isScared and self._steps == self._maxScaredSteps:
       self._isScared = False
-      self._scaredSteps = 0
-
-    if self._steps == self._stepsToSwitchMode:
-      self._isScattering = not self._isScattering
       self._steps = 0
 
-    self._steps += 1
-    if self._isScared:
-      self._scaredSteps += 1
+    elif self._isScattering and self._steps == self._maxScatterSteps:
+      self._isScattering = False
+      self._steps = 0
 
-    self.__moveCountDown = MOVE_COUNTDOWN 
+    elif not self._isScattering and self._steps == self._maxChaseSteps:
+      self._isScattering = True
+      self._steps = 0
+
+    else: 
+      self._steps += 1
+
+  def reset(self) -> None:
+    self._position = self.__initialPosition
+    self._direction = Direction.WEST
 
   def _filterMoves(self, moves: list[Action]) -> list[Action]:
     return list(filter(

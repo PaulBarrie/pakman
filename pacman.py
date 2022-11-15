@@ -27,10 +27,10 @@ class Pacman:
     self._maxLives = lives
     self._lives = lives
 
-  def die(self, respawnPosition: Position) -> None:
+  def die(self) -> None:
     if self._lives > 0:
       self._lives -= 1
-    self._position = respawnPosition
+    self._position = self._initialPosition
     self._direction = Direction.WEST
 
   def _best_action(self) -> Action:

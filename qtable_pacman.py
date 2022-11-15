@@ -38,7 +38,6 @@ class QtablePacman(Pacman):
       self.__gamma = gamma
       self.__history = history if history != None else []
       self.__cooling_rate = cooling_rate
-      print(len(self.qtable))
 
   def heat(self) -> None:
       self.__temperature = 1.0
@@ -46,23 +45,36 @@ class QtablePacman(Pacman):
   def _best_action(self) -> Action:
     if random() < self.__temperature:
       self.__temperature *= self.__cooling_rate
-      return choice(Action.as_list())
+      filteredActions = list(filter(
+        lambda action: not self._direction.is_reverse(action.to_direction()),
+        Action.as_list()
+      ))
+      return choice(filteredActions)
 
     actions = self.__qtable_get_or_create(self.__state)
-    return max(actions, key=actions.get)
+    filteredActions = { 
+      x: actions[x] 
+      for x in actions if not self._direction.is_reverse(x.to_direction())
+    }
+
+    return max(filteredActions, key=filteredActions.get)
 
   def step(self, game: Game) -> None:
     action = self._best_action()
-    # print(f"{self.__state} | {action}")
+    previousLives = self._lives
+
+    print(f"{self.__state} | {action}")
     state, reward, self._position = game.do(self._position, action, self.__state)
     maxQ = max(self.__qtable_get_or_create(state).values())
     delta = self.__alpha * (reward + self.__gamma * maxQ - self.__qtable_get_or_create(self.__state)[action])
     self.qtable[self.__state][action] += delta
 
-    self._direction = action.to_direction()
+    if previousLives == self._lives:
+      # direction already changed if pacman has died !
+      self._direction = action.to_direction()
+
     self.__state = state
-    self.__score += reward
-    self.__history.append(self.__score)
+    self.__score += reward   
 
   def __qtable_get_or_create(self, state: State) -> dict[Action, float]:
     return self.qtable.setdefault(
@@ -79,13 +91,12 @@ class QtablePacman(Pacman):
       pickle.dump((self.qtable, self.__history), file)
 
   def reset(self, state: State) -> None:
+    # save final round score
+    self.__history.append(self.__score)
+
     self._lives = self._maxLives
     self._position = self._initialPosition
     self._direction = Direction.WEST
     self.__state = state
-    print(len(self.qtable))
-
-  # def __repr__(self) -> str:
-  #   res = f'Agent {self.__state}\n'
-  #   res += str(self.qtable)
-  #   return res
+    self.__temperature = 0.0
+    self.__score = 0.0

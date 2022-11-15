@@ -1,4 +1,3 @@
-from typing import Any, Callable
 from actions import Action
 from blinky import Blinky
 from clyde import Clyde
@@ -67,8 +66,10 @@ class Game:
       currentGhost = self.__ghosts[self.__internalMovesCount]
       currentGhost.move(self.__world, self.__pacman)
       if currentGhost.position == self.__pacman.position:
-        self.__pacman.die(self.__pacmanRespawnLocation)
+        self.__pacman.die()
         self.resetGhosts()
+      if self.__pacman.lives == 0:
+        self.__isGameOver = True
     else:
       self.__pacman.step(self)
     self.__internalMovesCount = (self.__internalMovesCount + 1) % self.__agentCount
@@ -80,19 +81,15 @@ class Game:
   #  - the reward
   #  - the next position 
   def do(self, position: Position, action: Action, state: State) -> tuple[State, float, Position]:
-    # for ghost in self.__ghosts:
-    #   ghost.move(self.__world, self.__pacman)
     self.__moves += 1
-    # print(action)
     next_position = position.apply_action(action)
 
     if next_position in self.__getGhostPositions():
-      # print("Pacman died !")
-      self.__pacman.die(self.__pacmanRespawnLocation)
+      self.__pacman.die()
       self.resetGhosts()
       resetState = compute_state(
         self.__getGhostPositions(), 
-        self.__pacmanRespawnLocation, 
+        self.__pacman.position, 
         self.__world.getGums(), 
         self.__world.walls
       )
@@ -107,7 +104,6 @@ class Game:
 
     ## special logic when a gum is eaten
     if targetTile.isGum or targetTile.isSuperGum:
-      # print("Pacman ate a gum !")
       targetTile.empty()
       nextState = compute_state(
         self.__getGhostPositions(), 
@@ -125,7 +121,6 @@ class Game:
 
     ## pacman does not move but gets a bump on the head !
     if targetTile.isWall or not self.__world.isInBounds(next_position):
-      # print("Pacman bump ots head on a wall !")
       return (state, WALL_REWARD, self.__pacman.position)
 
     nextState = compute_state(
@@ -135,13 +130,13 @@ class Game:
       self.__world.walls
     )
     if targetTile.isEmpty:
-      # print("Pacman moved !")
       return (nextState, DEFAULT_REWARD, next_position)
 
     raise Exception("Invalid move or state")
 
   def resetGhosts(self) -> None:
-    self.__ghosts = self.__generateGhosts(self.__config)
+    for ghost in self.__ghosts:
+      ghost.reset()
 
   def setNextRound(self) -> None:
     self.resetGhosts()

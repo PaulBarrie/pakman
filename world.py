@@ -49,7 +49,6 @@ class World:
     for row in range(len(self.__tiles)):
       for col in range(len(self.__tiles[row])):
         if self.__tiles[row][col].isWall:
-          #print(f"{row} - {col}\n\n")
           positions.append(Position(row, col))
     return positions
 

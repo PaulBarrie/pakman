@@ -44,34 +44,28 @@ def pFactory(config, world: World, qtable = None, history = None) -> Pacman:
   
 def train():
   game = Game(GAME2_NO_GHOSTS, pacmanFactory=pFactory)
-  game.pacman.heat()
+  # game.pacman.heat()
   
   if os.path.exists(SAVE_FILE):
     game.pacman.load(SAVE_FILE)
   
   print("training without ghosts")
-  while game.rounds < 100:
+  while game.rounds < 50:
     game.move()
 
-    if game.moves >= 2000 or game.isGameOver:
-      if game.isGameOver:
-        print(f"game concluded in {game.moves} moves")
+    if game.moves >= 10000 or game.isGameOver:
       game.setNextRound()
-      game.pacman.heat()
-
   game.pacman.save(SAVE_FILE)
 
   game = Game(GAME2, pacmanFactory=pFactory)
   game.pacman.load(SAVE_FILE)
-  game.pacman.heat()
+  # game.pacman.heat()
 
   if len(game.ghosts):
     print("training with ghosts")
-    game.pacman.heat()
-    while game.rounds < 200:
+    while game.rounds < 100:
       game.move()
 
       if game.moves >= 10000 or game.isGameOver:
         game.setNextRound()
-        game.pacman.heat()
     game.pacman.save(SAVE_FILE)
