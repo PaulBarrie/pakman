@@ -9,11 +9,23 @@ from state import State, compute_state
 from world import World
 
 
-DEFAULT_REWARD = -100
-GUM_REWARD = -DEFAULT_REWARD
-GHOST_REWARD = -500
-WALL_REWARD = -1000
-WIN_REWARD = 1000
+# DEFAULT_REWARD = -0.1
+# GUM_REWARD = 2
+# GHOST_REWARD = -5
+# WALL_REWARD = -0.1
+# WIN_REWARD = 20
+# LOSE_REWARD = -10
+
+GUM_REWARD = 100
+DEFAULT_REWARD = -GUM_REWARD // 5
+LONG_RANGE_RADAR_STATES = 2 ** 4 * 3
+SHORT_RANGE_RADAR_STATES = 2 ** 4
+AREA_RADAR_STATES = 2 ** 8
+NB_STATES = LONG_RANGE_RADAR_STATES * SHORT_RANGE_RADAR_STATES * SHORT_RANGE_RADAR_STATES
+GHOST_REWARD = -NB_STATES // 10
+WALL_REWARD = -NB_STATES
+WIN_REWARD = NB_STATES
+LOSE_REWARD = -NB_STATES // 2
 
 class Game:
   @property
@@ -58,6 +70,7 @@ class Game:
       config["pacman"]["position"][0], 
       config["pacman"]["position"][1]
     )
+    self.__pacmanDiedByGhost = False
 
     self.__agentCount = 1 + len(self.__ghosts)
 
@@ -67,10 +80,20 @@ class Game:
       currentGhost.move(self.__world, self.__pacman)
       if currentGhost.position == self.__pacman.position:
         self.__pacman.die()
+        self.__pacmanDiedByGhost = True
         self.resetGhosts()
       if self.__pacman.lives == 0:
         self.__isGameOver = True
     else:
+      if self.__pacmanDiedByGhost:
+        self.__pacmanDiedByGhost = False
+        self.__pacman.refreshState(compute_state(
+          self.__getGhostPositions(), 
+          self.__pacman.position,
+          self.__world.getGums(),
+          self.__world.walls
+        ))
+
       self.__pacman.step(self)
     self.__internalMovesCount = (self.__internalMovesCount + 1) % self.__agentCount
 
@@ -85,6 +108,7 @@ class Game:
     next_position = position.apply_action(action)
 
     if next_position in self.__getGhostPositions():
+      reward = GHOST_REWARD
       self.__pacman.die()
       self.resetGhosts()
       resetState = compute_state(
@@ -96,7 +120,8 @@ class Game:
 
       if self.__pacman.lives <= 0:
         self.__isGameOver = True
-      return (resetState, GHOST_REWARD, self.__pacmanRespawnLocation)
+        reward = LOSE_REWARD
+      return (resetState, reward, self.__pacmanRespawnLocation)
 
     pacmanRow = next_position.row
     pacmanColumn = next_position.column

@@ -154,7 +154,7 @@ def pFactory(config, world: World, qtable = None, history = None) -> Pacman:
 SAVE_FILE = "qtable.dat"
 
 def launchGUI():
-  game = Game(GAME2_NO_GHOSTS, pacmanFactory=pFactory)
+  game = Game(GAME2, pacmanFactory=pFactory)
 
   if os.path.exists(SAVE_FILE):
     game.pacman.load(SAVE_FILE)

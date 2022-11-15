@@ -146,3 +146,28 @@ def compute_state(
 #     getAreaRadar(pacman_position, ghost_positions)
 
 #   return (wallN, wallW, wallS, wallE, gumN, gumW, gumS, gumE, gumDist, threatN, threatW, threatS, threatE, threatNW, threatNE, threatSW, threatSE)
+
+
+# HYBRID IMPLEMENTATION
+# State = tuple[bool, bool, bool, bool, bool, bool, bool, bool, int, bool, bool, bool, bool]
+# def compute_state(
+#   ghost_positions: list[Position], 
+#   pacman_position: Position, 
+#   gum_positions: list[Position], 
+#   wall_positions: list[Position]
+# ) -> State:
+#   wallN, wallW, wallS, wallE = getShortRangeRadar(pacman_position, wall_positions)
+#   gumN, gumW, gumS, gumE, gumDist = getLongRangeRadar(pacman_position, gum_positions)
+#   threatN = False
+#   threatW = False
+#   threatS = False
+#   threatE = False
+
+#   for gp in ghost_positions:
+#     searchRes = getThreat(gp, pacman_position, wall_positions)
+#     threatN = searchRes == Direction.NORTH
+#     threatW = searchRes == Direction.WEST
+#     threatS = searchRes == Direction.SOUTH
+#     threatE = searchRes == Direction.EAST
+  
+#   return (wallN, wallW, wallS, wallE, gumN, gumW, gumS, gumE, gumDist, threatN, threatW, threatS, threatE)
