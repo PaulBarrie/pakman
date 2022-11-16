@@ -30,15 +30,16 @@ class Ghost:
         self.__direction = initial_direction
         self.__is_scared = is_scared
 
-    def step(self, walls: list[Position], pakman: Pakman) -> tuple[Action, float]:
+    def step(self, walls: list[Position], pakman: Pakman, initial_pakman_position: Position) -> tuple[Action, float, Position]:
         optimum_action = self._best_action(walls, pakman)
         self.__position = self.__position.apply_action(optimum_action)
         self.__direction = optimum_action.to_direction()
 
         if self.__position == pakman.position:
             pakman.die()
+            return (optimum_action, -1.0, initial_pakman_position)
 
-        return (optimum_action, -1.0)
+        return (optimum_action, -1.0, pakman.position)
 
     def _best_action(self, walls: list[Position], pakman: Pakman) -> Action:
         legal_actions = list(filter(

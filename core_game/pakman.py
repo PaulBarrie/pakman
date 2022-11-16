@@ -22,10 +22,25 @@ class Pakman:
         self._direction = initial_direction
         self.__lives = lives
 
+    def move_to(self, position: Position) -> None:
+        self._position = position
+
     def die(self) -> None:
+        # print("The Punjabi Warrior has died !")
         if self.__lives > 0:
             self.__lives -= 1
         self._direction = Direction.WEST
+    
+    def heat(self) -> None:
+      pass
+
+    def refreshState(
+      self,
+      ghost_positions: list[Position],
+      gum_positions: list[Position], 
+      wall_positions: list[Position]
+    ) -> None:
+      pass
 
     def _best_action(self) -> Action:
         raise NotImplemented()

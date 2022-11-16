@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from pakman_windowless import PakmanWindowless
 
 SAVE_FILE = 'qtable.dat'
-GRAPHICAL_INTERFACE = True
+GRAPHICAL_INTERFACE = False
 
 if __name__ == '__main__':
     environment = Environment.from_str_map(maps.GAME2)
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         arcade.run()
     else:
         pakman = PakmanWindowless(environment, agent)
-        for i in range(1, 50000):
+        for i in range(1, 100000):
             pakman.update()
 
     agent.save(SAVE_FILE)
